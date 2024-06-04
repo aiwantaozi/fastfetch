@@ -22,6 +22,11 @@ static void printGPUResult(FFGPUOptions* options, uint8_t index, const FFGPUResu
         default: type = "Unknown"; break;
     }
 
+    if (gpu->index != FF_GPU_INDEX_UNSET)
+    {
+        index = gpu->index;
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+
     if(options->moduleArgs.outputFormat.length == 0)
     {
         ffPrintLogoAndKey(FF_GPU_MODULE_NAME, index, &options->moduleArgs, FF_PRINT_TYPE_DEFAULT);
@@ -322,6 +327,15 @@ void ffGenerateGPUJsonResult(FFGPUOptions* options, yyjson_mut_doc* doc, yyjson_
     FF_LIST_FOR_EACH(FFGPUResult, gpu, gpus)
     {
         yyjson_mut_val* obj = yyjson_mut_arr_add_obj(doc, arr);
+
+        if (gpu->index != FF_GPU_INDEX_UNSET){
+            yyjson_mut_obj_add_uint8(doc, obj, "index", gpu->index);
+        }
+        else
+        {
+            yyjson_mut_obj_add_null(doc, obj, "index");
+        }
+
         if (gpu->coreCount != FF_GPU_CORE_COUNT_UNSET)
             yyjson_mut_obj_add_int(doc, obj, "coreCount", gpu->coreCount);
         else
@@ -402,7 +416,7 @@ void ffPrintGPUHelpFormat(void)
         "GPU used shared memory - shared-used",
         "The platform API used when detecting the GPU - platform-api",
         "Current frequency in GHz - frequency",
-    }));
+    }));                                                                                           
 }
 
 void ffInitGPUOptions(FFGPUOptions* options)
