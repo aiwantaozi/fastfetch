@@ -37,11 +37,15 @@ typedef struct FFGpuDriverCondition
 // detect x if not NULL
 typedef struct FFGpuDriverResult
 {
+    uint8_t* index;
+    FFstrbuf* uuid;
+    FFstrbuf* name;
     double* temp;
     FFGPUMemory* memory;
     uint32_t* coreCount;
     FFGPUType* type;
     double* frequency;
+    double* coreUtilizationRate; 
 } FFGpuDriverResult;
 
 const char* ffDetectNvidiaGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverResult result, const char* soName);

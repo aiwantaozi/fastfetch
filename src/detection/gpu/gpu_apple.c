@@ -52,6 +52,15 @@ const char* ffDetectGPUImpl(const FFGPUOptions* options, FFlist* gpus)
             continue;
         }
 
+        FFstrbuf category;
+        ffStrbufInit(&category);
+        if(ffCfDictGetString(properties, CFSTR("IOMatchCategory"), &category) || !ffStrbufContainS(&category, "IOAccelerator"))
+        {
+            CFRelease(properties);
+            IOObjectRelease(registryEntry);
+            continue;
+        }
+
         FFGPUResult* gpu = ffListAdd(gpus);
 
         gpu->dedicated.total = gpu->dedicated.used = gpu->shared.total = gpu->shared.used = FF_GPU_VMEM_SIZE_UNSET;
@@ -65,6 +74,45 @@ const char* ffDetectGPUImpl(const FFGPUOptions* options, FFlist* gpus)
 
         if(ffCfDictGetInt(properties, CFSTR("gpu-core-count"), &gpu->coreCount)) // For Apple
             gpu->coreCount = FF_GPU_CORE_COUNT_UNSET;
+
+        gpu->coreUtilizationRate = FF_GPU_CORE_UTILIZATION_RATE_UNSET;
+        if (CFDictionaryContainsKey(properties, CFSTR("PerformanceStatistics")))
+        {
+            CFDictionaryRef performanceDict;
+            if (!ffCfDictGetDict(properties, CFSTR("PerformanceStatistics"), &performanceDict))
+            {
+                ffCfDictGetDouble(performanceDict, CFSTR("Device Utilization %"), &gpu->coreUtilizationRate);
+
+                bool isVram = false;
+                int64_t freeMemory = 0;
+                int64_t usedMemory = 0;
+                int64_t totalMemory = 0;
+
+                CFStringRef keys[] = {CFSTR("In use system memory"), CFSTR("In use system memory (driver)"), CFSTR("gartUsedBytes"), CFSTR("vramUsedBytes")};
+                for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); i++) {
+                    
+                    if (ffCfDictGetInt64(performanceDict, keys[i], &usedMemory) == NULL) {
+                        if (keys[i] == CFSTR("vramUsedBytes"))
+                        {
+                            isVram = true;
+                        }
+                        break;
+                    }
+                }
+
+                if(ffCfDictGetInt64(performanceDict, CFSTR("gartSizeBytes"), &totalMemory))
+                {
+                    if (isVram)
+                    {
+                        ffCfDictGetInt64(performanceDict, CFSTR("vramFreeBytes"), &freeMemory);
+                        totalMemory = usedMemory + freeMemory;
+                    }
+                }
+
+                gpu->dedicated.total = (uint64_t)totalMemory;
+                gpu->dedicated.used = (uint64_t)usedMemory;
+            }
+        }
 
         ffStrbufInit(&gpu->name);
         //IOAccelerator returns model / vendor-id properties for Apple Silicon, but not for Intel Iris GPUs.
@@ -83,6 +131,8 @@ const char* ffDetectGPUImpl(const FFGPUOptions* options, FFlist* gpus)
             }
             ffCfDictGetString(properties, CFSTR("model"), &gpu->name);
         }
+
+        gpu->uuid = ffStrbufGetUUID(&gpu->name);
 
         ffStrbufInit(&gpu->vendor);
         int vendorId;

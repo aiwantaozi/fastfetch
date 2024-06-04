@@ -6,6 +6,8 @@
 #define FF_GPU_CORE_COUNT_UNSET -1
 #define FF_GPU_VMEM_SIZE_UNSET ((uint64_t)-1)
 #define FF_GPU_FREQUENCY_UNSET (0/0.0)
+#define FF_GPU_CORE_UTILIZATION_RATE_UNSET -1
+#define FF_GPU_INDEX_UNSET ((uint8_t)-1)
 
 extern const char* FF_GPU_VENDOR_NAME_APPLE;
 extern const char* FF_GPU_VENDOR_NAME_AMD;
@@ -25,6 +27,7 @@ typedef struct FFGPUMemory
 
 typedef struct FFGPUResult
 {
+    uint8_t index;
     FFGPUType type;
     FFstrbuf vendor;
     FFstrbuf name;
@@ -33,9 +36,11 @@ typedef struct FFGPUResult
     double temperature;
     int32_t coreCount;
     double frequency; // Maximum time clock frequency in GHz
+    double coreUtilizationRate;
     FFGPUMemory dedicated;
     FFGPUMemory shared;
     uint64_t deviceId; // Used internally, may be uninitialized
+    FFstrbuf uuid;     // Identifier for the GPU
 } FFGPUResult;
 
 const char* ffDetectGPU(const FFGPUOptions* options, FFlist* result);
