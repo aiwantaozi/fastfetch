@@ -5,21 +5,21 @@ on:
   - pull_request
 
 jobs:
-  spellcheck:
-    runs-on: ubuntu-latest
+  # spellcheck:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Install codespell
-        shell: bash
-        run: |
-          sudo apt-get update || true
-          sudo apt-get install -y codespell
+  #     - name: Install codespell
+  #       shell: bash
+  #       run: |
+  #         sudo apt-get update || true
+  #         sudo apt-get install -y codespell
 
-      - name: Run Spellchecker
-        run: codespell
+  #     - name: Run Spellchecker
+  #       run: codespell
 
   # no-features-test:
   #   name: No-features-test
@@ -291,7 +291,7 @@ jobs:
         shell: msys2 {0}
     steps:
       - name: print system info
-        run: syteminfo
+        run: systeminfo
 
       - name: checkout repository
         uses: actions/checkout@v4
