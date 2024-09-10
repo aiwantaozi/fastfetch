@@ -292,6 +292,7 @@ jobs:
     steps:
       - name: print system info
         run: systeminfo
+        shell: powershell
 
       - name: checkout repository
         uses: actions/checkout@v4
