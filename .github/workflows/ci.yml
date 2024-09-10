@@ -290,6 +290,9 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
+      - name: print system info
+        run: syteminfo
+
       - name: checkout repository
         uses: actions/checkout@v4
 
@@ -302,6 +305,13 @@ jobs:
 
       - name: print msys version
         run: uname -a
+      
+      - name: Add CMake to PATH
+        run: |
+          echo "C:\msys64\clangarm64\bin" >> $env:GITHUB_PATH
+
+      - name: Verify CMake version
+        run: cmake --version
 
       - name: configure project
         run: env PKG_CONFIG_PATH=/clang64/lib/pkgconfig/:$PKG_CONFIG_PATH cmake -DSET_TWEAK=Off -DBUILD_TESTS=On .
