@@ -36,8 +36,8 @@ void ffPrintTheme(FFThemeOptions* options)
     else
     {
         FF_PRINT_FORMAT_CHECKED(FF_THEME_MODULE_NAME, 0, &options->moduleArgs, FF_PRINT_TYPE_DEFAULT, FF_THEME_NUM_FORMAT_ARGS, ((FFformatarg[]){
-            {FF_FORMAT_ARG_TYPE_STRBUF, &result.theme1, "theme1"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &result.theme2, "theme2"},
+            FF_FORMAT_ARG(result.theme1, "theme1"),
+            FF_FORMAT_ARG(result.theme2, "theme2"),
         }));
     }
 
@@ -123,7 +123,7 @@ void ffInitThemeOptions(FFThemeOptions* options)
         ffPrintThemeHelpFormat,
         ffGenerateThemeJsonConfig
     );
-    ffOptionInitModuleArg(&options->moduleArgs);
+    ffOptionInitModuleArg(&options->moduleArgs, "󰉼");
 }
 
 void ffDestroyThemeOptions(FFThemeOptions* options)

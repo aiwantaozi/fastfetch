@@ -7,6 +7,7 @@ typedef struct FFOptionsModules
     FFBatteryOptions battery;
     FFBiosOptions bios;
     FFBluetoothOptions bluetooth;
+    FFBluetoothRadioOptions bluetoothRadio;
     FFBoardOptions board;
     FFBootmgrOptions bootmgr;
     FFBreakOptions break_;
@@ -71,6 +72,7 @@ typedef struct FFOptionsModules
     FFWallpaperOptions wallpaper;
     FFWeatherOptions weather;
     FFWifiOptions wifi;
+    FFZpoolOptions zpool;
 } FFOptionsModules;
 
 void ffOptionsInitModules(FFOptionsModules* options);

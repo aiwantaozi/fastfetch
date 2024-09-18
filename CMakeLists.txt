@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12.0) # target_link_libraries with OBJECT libs & project homepage url
 
 project(fastfetch
-    VERSION 2.18.1.5
+    VERSION 2.24.0
     LANGUAGES C
     DESCRIPTION "Fast neofetch-like system information tool"
     HOMEPAGE_URL "https://github.com/fastfetch-cli/fastfetch"
@@ -9,68 +9,68 @@ project(fastfetch
 
 set(PROJECT_LICENSE "MIT license")
 
-###################
+# ##################
 # Target Platform #
-###################
+# ##################
 if(ANDROID)
     set(LINUX FALSE)
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     set(LINUX TRUE CACHE BOOL "..." FORCE) # LINUX means GNU/Linux, not just the kernel
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
-    set(BSD TRUE CACHE BOOL "..." FORCE)
+    set(FreeBSD TRUE CACHE BOOL "..." FORCE)
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "SunOS")
     set(SunOS TRUE CACHE BOOL "..." FORCE)
 elseif(NOT APPLE AND NOT WIN32)
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()
 
-#############################
+# ############################
 # Compile time dependencies #
-#############################
-
+# ############################
 set(THREADS_PREFER_PTHREAD_FLAG NOT WIN32)
 find_package(Threads)
 
 find_package(PkgConfig)
+
 if(NOT PKG_CONFIG_FOUND)
     message(WARNING "pkg-config not found, library detection might be limited")
 endif()
 
 include(CheckIncludeFile)
 
-#####################
+# ####################
 # Configure options #
-#####################
-
+# ####################
 include(CMakeDependentOption)
 
-cmake_dependent_option(ENABLE_VULKAN "Enable vulkan" ON "LINUX OR APPLE OR BSD OR WIN32 OR ANDROID OR SunOS" OFF)
-cmake_dependent_option(ENABLE_WAYLAND "Enable wayland-client" ON "LINUX OR BSD" OFF)
-cmake_dependent_option(ENABLE_XCB_RANDR "Enable xcb-randr" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_XCB "Enable xcb" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_XRANDR "Enable xrandr" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_X11 "Enable x11" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_DRM "Enable libdrm" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_GIO "Enable gio-2.0" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_DCONF "Enable dconf" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_DBUS "Enable dbus-1" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_XFCONF "Enable libxfconf-0" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_SQLITE3 "Enable sqlite3" ON "LINUX OR BSD OR APPLE OR SunOS" OFF)
+cmake_dependent_option(ENABLE_VULKAN "Enable vulkan" ON "LINUX OR APPLE OR FreeBSD OR WIN32 OR ANDROID OR SunOS" OFF)
+cmake_dependent_option(ENABLE_WAYLAND "Enable wayland-client" ON "LINUX OR FreeBSD" OFF)
+cmake_dependent_option(ENABLE_XCB_RANDR "Enable xcb-randr" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_XCB "Enable xcb" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_XRANDR "Enable xrandr" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_X11 "Enable x11" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_DRM "Enable libdrm" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_GIO "Enable gio-2.0" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_DCONF "Enable dconf" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_DBUS "Enable dbus-1" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_XFCONF "Enable libxfconf-0" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_SQLITE3 "Enable sqlite3" ON "LINUX OR FreeBSD OR APPLE OR SunOS" OFF)
 cmake_dependent_option(ENABLE_RPM "Enable rpm" ON "LINUX" OFF)
-cmake_dependent_option(ENABLE_IMAGEMAGICK7 "Enable imagemagick 7" ON "LINUX OR BSD OR APPLE OR WIN32 OR SunOS" OFF)
-cmake_dependent_option(ENABLE_IMAGEMAGICK6 "Enable imagemagick 6" ON "LINUX OR BSD OR APPLE OR SunOS" OFF)
+cmake_dependent_option(ENABLE_IMAGEMAGICK7 "Enable imagemagick 7" ON "LINUX OR FreeBSD OR APPLE OR WIN32 OR SunOS" OFF)
+cmake_dependent_option(ENABLE_IMAGEMAGICK6 "Enable imagemagick 6" ON "LINUX OR FreeBSD OR APPLE OR SunOS" OFF)
 cmake_dependent_option(ENABLE_CHAFA "Enable chafa" ON "ENABLE_IMAGEMAGICK6 OR ENABLE_IMAGEMAGICK7" OFF)
 cmake_dependent_option(ENABLE_ZLIB "Enable zlib" ON "ENABLE_IMAGEMAGICK6 OR ENABLE_IMAGEMAGICK7" OFF)
-cmake_dependent_option(ENABLE_EGL "Enable egl" ON "LINUX OR BSD OR WIN32 OR SunOS" OFF)
-cmake_dependent_option(ENABLE_GLX "Enable glx" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_OSMESA "Enable osmesa" ON "LINUX OR BSD OR SunOS" OFF)
-cmake_dependent_option(ENABLE_OPENCL "Enable opencl" ON "LINUX OR BSD OR WIN32 OR ANDROID OR SunOS" OFF)
-cmake_dependent_option(ENABLE_LIBNM "Enable libnm" ON "LINUX" OFF)
+cmake_dependent_option(ENABLE_EGL "Enable egl" ON "LINUX OR FreeBSD OR WIN32 OR SunOS" OFF)
+cmake_dependent_option(ENABLE_GLX "Enable glx" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_OSMESA "Enable osmesa" ON "LINUX OR FreeBSD OR SunOS" OFF)
+cmake_dependent_option(ENABLE_OPENCL "Enable opencl" ON "LINUX OR FreeBSD OR WIN32 OR ANDROID OR SunOS" OFF)
 cmake_dependent_option(ENABLE_FREETYPE "Enable freetype" ON "ANDROID" OFF)
 cmake_dependent_option(ENABLE_PULSE "Enable pulse" ON "LINUX OR SunOS" OFF)
 cmake_dependent_option(ENABLE_DDCUTIL "Enable ddcutil" ON "LINUX" OFF)
 cmake_dependent_option(ENABLE_DIRECTX_HEADERS "Enable DirectX headers for WSL" ON "LINUX" OFF)
+cmake_dependent_option(ENABLE_ELF "Enable libelf" ON "LINUX OR ANDROID" OFF)
 cmake_dependent_option(ENABLE_THREADS "Enable multithreading" ON "Threads_FOUND" OFF)
+cmake_dependent_option(ENABLE_LIBZFS "Enable libzfs" ON "LINUX OR FreeBSD OR SunOS" OFF)
 
 option(ENABLE_SYSTEM_YYJSON "Use system provided (instead of fastfetch embedded) yyjson library" OFF)
 option(ENABLE_ASAN "Build fastfetch with ASAN (address sanitizer)" OFF)
@@ -83,25 +83,26 @@ option(INSTALL_LICENSE "Install license into /usr/share/licenses" ON)
 set(BINARY_LINK_TYPE_OPTIONS dlopen dynamic static)
 set(BINARY_LINK_TYPE dlopen CACHE STRING "How to link fastfetch")
 set_property(CACHE BINARY_LINK_TYPE PROPERTY STRINGS ${BINARY_LINK_TYPE_OPTIONS})
+
 if(NOT BINARY_LINK_TYPE IN_LIST BINARY_LINK_TYPE_OPTIONS)
     message(FATAL_ERROR "BINARY_LINK_TYPE must be one of ${BINARY_LINK_TYPE_OPTIONS}")
 endif()
 
-if (LINUX)
+if(LINUX)
     set(CUSTOM_PCI_IDS_PATH "" CACHE STRING "Custom path to file pci.ids, defaults to `/usr/share/hwdata/pci.ids`")
     set(CUSTOM_AMDGPU_IDS_PATH "" CACHE STRING "Custom path to file amdgpu.ids, defaults to `/usr/share/libdrm/amdgpu.ids`")
     set(CUSTOM_OS_RELEASE_PATH "" CACHE STRING "Custom path to file os-release, defaults to `/etc/os-release`")
 endif()
 
-####################
+# ###################
 # Compiler options #
-####################
-
+# ###################
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 if(ENABLE_THREADS)
     if(CMAKE_USE_WIN32_THREADS_INIT)
         message(STATUS "Threads type: Win32 thread")
@@ -130,12 +131,15 @@ elseif(APPLE AND CMAKE_C_COMPILER_ID MATCHES "Clang")
 endif()
 
 set(FASTFETCH_FLAGS_DEBUG "-fno-omit-frame-pointer")
+
 if(ENABLE_ASAN)
     message(STATUS "Address sanitizer enabled (DEBUG only)")
     set(FASTFETCH_FLAGS_DEBUG "${FASTFETCH_FLAGS_DEBUG} -fsanitize=address")
 endif()
+
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${FASTFETCH_FLAGS_DEBUG}")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${FASTFETCH_FLAGS_DEBUG} -fstack-protector-all -fno-delete-null-pointer-checks")
+
 if(NOT WIN32)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -rdynamic")
 endif()
@@ -144,15 +148,15 @@ if(ENABLE_LTO AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Enabling LTO")
     include(CheckIPOSupported)
     check_ipo_supported(RESULT IPO_SUPPORTED)
+
     if(IPO_SUPPORTED)
         set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
     endif()
 endif()
 
-#######################
+# ######################
 # Target FS structure #
-#######################
-
+# ######################
 if(NOT TARGET_DIR_ROOT)
     if(NOT ANDROID)
         set(TARGET_DIR_ROOT "")
@@ -185,7 +189,7 @@ endif()
 
 message(STATUS "Target dirs: ROOT=\"${TARGET_DIR_ROOT}\" USR=\"${TARGET_DIR_USR}\" HOME=\"${TARGET_DIR_HOME}\" ETC=\"${TARGET_DIR_ETC}\"")
 
-#https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT.html
+# https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT.html
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${TARGET_DIR_USR}" CACHE PATH "..." FORCE)
 endif()
@@ -194,34 +198,33 @@ if(NOT CMAKE_INSTALL_SYSCONFDIR)
     set(CMAKE_INSTALL_SYSCONFDIR "${TARGET_DIR_ETC}" CACHE PATH "..." FORCE)
 endif()
 
-#################
+# ################
 # Tweak version #
-#################
-
-if (SET_TWEAK AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+# ################
+if(SET_TWEAK AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(
         COMMAND git describe --tags
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        OUTPUT_VARIABLE PROJECT_VERSION_TWEAK
+        OUTPUT_VARIABLE PROJECT_VERSION_GIT
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    string(REGEX MATCH "-[0-9]+" PROJECT_VERSION_TWEAK "${PROJECT_VERSION_TWEAK}")
+    string(REGEX MATCH "-[0-9]+" PROJECT_VERSION_TWEAK "${PROJECT_VERSION_GIT}")
 endif()
+
 if(PROJECT_VERSION_TWEAK)
     string(REGEX MATCH "[0-9]+" PROJECT_VERSION_TWEAK_NUM "${PROJECT_VERSION_TWEAK}")
 else()
     set(PROJECT_VERSION_TWEAK_NUM 0)
 endif()
 
-#############
+# ############
 # Text data #
-#############
-
+# ############
 function(fastfetch_encode_c_string STR OUTVAR)
-    string(REGEX REPLACE "\n$" "" TEMP "${STR}")  # Remove trailing newline
-    string(REPLACE "\\" "\\\\" TEMP "${TEMP}")    # Escape backslashes
-    string(REPLACE "\n" "\\n" TEMP "${TEMP}")     # Replace newlines with \n
-    string(REPLACE "\"" "\\\"" TEMP "${TEMP}")    # Replace quotes with \"
+    string(REGEX REPLACE "\n$" "" TEMP "${STR}") # Remove trailing newline
+    string(REPLACE "\\" "\\\\" TEMP "${TEMP}") # Escape backslashes
+    string(REPLACE "\n" "\\n" TEMP "${TEMP}") # Replace newlines with \n
+    string(REPLACE "\"" "\\\"" TEMP "${TEMP}") # Replace quotes with \"
     set(${OUTVAR} "\"${TEMP}\"" PARENT_SCOPE)
 endfunction(fastfetch_encode_c_string)
 
@@ -232,10 +235,12 @@ function(fastfetch_load_text FILENAME OUTVAR)
 endfunction(fastfetch_load_text)
 
 find_package(Python)
+
 if(Python_FOUND)
     execute_process(COMMAND ${Python_EXECUTABLE} -c "import json,sys;json.dump(json.load(sys.stdin),sys.stdout,separators=(',',':'))"
-                    INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/data/help.json"
-                    OUTPUT_VARIABLE DATATEXT_JSON_HELP)
+        INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/data/help.json"
+        OUTPUT_VARIABLE DATATEXT_JSON_HELP)
+
     if(DATATEXT_JSON_HELP STREQUAL "")
         message(ERROR "DATATEXT_JSON_HELP is empty, which should not happen!")
     endif()
@@ -252,6 +257,7 @@ fastfetch_load_text(src/data/help_format.txt DATATEXT_HELP_FORMAT)
 
 configure_file(src/fastfetch_config.h.in fastfetch_config.h @ONLY)
 configure_file(src/fastfetch_datatext.h.in fastfetch_datatext.h @ONLY)
+
 if(APPLE)
     configure_file(src/util/apple/Info.plist.in Info.plist @ONLY)
 endif()
@@ -259,12 +265,12 @@ endif()
 string(TIMESTAMP FASTFETCH_BUILD_DATE "%d %B %Y" UTC)
 configure_file(doc/fastfetch.1.in fastfetch.1 @ONLY)
 
-####################
+# ###################
 # Ascii image data #
-####################
-
+# ###################
 file(GLOB LOGO_FILES "src/logo/ascii/*.txt")
 set(LOGO_BUILTIN_H "#pragma once\n#pragma GCC diagnostic ignored \"-Wtrigraphs\"\n\n")
+
 foreach(file ${LOGO_FILES})
     fastfetch_load_text("${file}" content)
     get_filename_component(file "${file}" NAME_WE)
@@ -272,12 +278,12 @@ foreach(file ${LOGO_FILES})
     string(REGEX REPLACE "\\$\\{c([0-9]+)\\}" "$\\1" content "${content}")
     set(LOGO_BUILTIN_H "${LOGO_BUILTIN_H}#define FASTFETCH_DATATEXT_LOGO_${file} ${content}\n")
 endforeach()
+
 file(GENERATE OUTPUT logo_builtin.h CONTENT "${LOGO_BUILTIN_H}")
 
-#######################
+# ######################
 # libfastfetch target #
-#######################
-
+# ######################
 set(LIBFASTFETCH_SRC
     src/common/percent.c
     src/common/commandoption.c
@@ -294,6 +300,7 @@ set(LIBFASTFETCH_SRC
     src/common/properties.c
     src/common/settings.c
     src/common/temps.c
+    src/detection/bluetoothradio/bluetoothradio.c
     src/detection/bootmgr/bootmgr.c
     src/detection/chassis/chassis.c
     src/detection/cpu/cpu.c
@@ -326,6 +333,7 @@ set(LIBFASTFETCH_SRC
     src/modules/battery/battery.c
     src/modules/bios/bios.c
     src/modules/bluetooth/bluetooth.c
+    src/modules/bluetoothradio/bluetoothradio.c
     src/modules/board/board.c
     src/modules/bootmgr/bootmgr.c
     src/modules/brightness/brightness.c
@@ -390,15 +398,16 @@ set(LIBFASTFETCH_SRC
     src/modules/wifi/wifi.c
     src/modules/wm/wm.c
     src/modules/wmtheme/wmtheme.c
+    src/modules/zpool/zpool.c
     src/options/display.c
     src/options/modules.c
     src/options/logo.c
     src/options/general.c
-    src/options/library.c
     src/util/edidHelper.c
     src/util/base64.c
     src/util/FFlist.c
     src/util/FFstrbuf.c
+    src/util/path.c
     src/util/platform/FFPlatform.c
     src/util/smbiosHelper.c
 )
@@ -421,6 +430,7 @@ if(LINUX)
         src/detection/cpuusage/cpuusage_linux.c
         src/detection/cursor/cursor_linux.c
         src/detection/bluetooth/bluetooth_linux.c
+        src/detection/bluetoothradio/bluetoothradio_linux.c
         src/detection/disk/disk_linux.c
         src/detection/dns/dns_linux.c
         src/detection/physicaldisk/physicaldisk_linux.c
@@ -477,7 +487,9 @@ if(LINUX)
         src/detection/de/de_linux.c
         src/detection/wmtheme/wmtheme_linux.c
         src/detection/camera/camera_linux.c
+        src/detection/zpool/zpool_linux.c
         src/util/platform/FFPlatform_unix.c
+        src/util/binary_linux.c
     )
 elseif(ANDROID)
     list(APPEND LIBFASTFETCH_SRC
@@ -488,6 +500,7 @@ elseif(ANDROID)
         src/detection/battery/battery_android.c
         src/detection/bios/bios_android.c
         src/detection/bluetooth/bluetooth_nosupport.c
+        src/detection/bluetoothradio/bluetoothradio_nosupport.c
         src/detection/board/board_android.c
         src/detection/bootmgr/bootmgr_nosupport.c
         src/detection/brightness/brightness_nosupport.c
@@ -537,9 +550,11 @@ elseif(ANDROID)
         src/detection/de/de_nosupport.c
         src/detection/wmtheme/wmtheme_nosupport.c
         src/detection/camera/camera_android.c
+        src/detection/zpool/zpool_nosupport.c
         src/util/platform/FFPlatform_unix.c
+        src/util/binary_linux.c
     )
-elseif(BSD)
+elseif(FreeBSD)
     list(APPEND LIBFASTFETCH_SRC
         src/common/dbus.c
         src/common/io/io_unix.c
@@ -550,6 +565,7 @@ elseif(BSD)
         src/detection/battery/battery_bsd.c
         src/detection/bios/bios_bsd.c
         src/detection/bluetooth/bluetooth_linux.c
+        src/detection/bluetoothradio/bluetoothradio_linux.c
         src/detection/board/board_bsd.c
         src/detection/bootmgr/bootmgr_bsd.c
         src/detection/brightness/brightness_bsd.c
@@ -591,7 +607,7 @@ elseif(BSD)
         src/detection/gamepad/gamepad_bsd.c
         src/detection/media/media_linux.c
         src/detection/memory/memory_bsd.c
-        src/detection/monitor/monitor_nosupport.c
+        src/detection/monitor/monitor_linux.c
         src/detection/netio/netio_bsd.c
         src/detection/opengl/opengl_linux.c
         src/detection/os/os_linux.c
@@ -614,7 +630,9 @@ elseif(BSD)
         src/detection/de/de_linux.c
         src/detection/wmtheme/wmtheme_linux.c
         src/detection/camera/camera_linux.c
+        src/detection/zpool/zpool_linux.c
         src/util/platform/FFPlatform_unix.c
+        src/util/binary_linux.c
     )
 elseif(APPLE)
     list(APPEND LIBFASTFETCH_SRC
@@ -626,6 +644,7 @@ elseif(APPLE)
         src/detection/battery/battery_apple.c
         src/detection/bios/bios_apple.c
         src/detection/bluetooth/bluetooth_apple.m
+        src/detection/bluetoothradio/bluetoothradio_apple.m
         src/detection/board/board_apple.c
         src/detection/bootmgr/bootmgr_apple.c
         src/detection/brightness/brightness_apple.c
@@ -676,9 +695,11 @@ elseif(APPLE)
         src/detection/de/de_nosupport.c
         src/detection/wmtheme/wmtheme_apple.m
         src/detection/camera/camera_apple.m
+        src/detection/zpool/zpool_nosupport.c
         src/util/apple/cf_helpers.c
         src/util/apple/osascript.m
         src/util/platform/FFPlatform_unix.c
+        src/util/binary_apple.c
     )
 elseif(WIN32)
     list(APPEND LIBFASTFETCH_SRC
@@ -689,6 +710,7 @@ elseif(WIN32)
         src/detection/battery/battery_windows.c
         src/detection/bios/bios_windows.c
         src/detection/bluetooth/bluetooth_windows.c
+        src/detection/bluetoothradio/bluetoothradio_windows.c
         src/detection/board/board_windows.c
         src/detection/bootmgr/bootmgr_windows.c
         src/detection/brightness/brightness_windows.cpp
@@ -738,12 +760,14 @@ elseif(WIN32)
         src/detection/de/de_nosupport.c
         src/detection/wmtheme/wmtheme_windows.c
         src/detection/camera/camera_windows.cpp
+        src/detection/zpool/zpool_nosupport.c
         src/util/windows/getline.c
         src/util/windows/com.cpp
         src/util/windows/registry.c
         src/util/windows/unicode.c
         src/util/windows/wmi.cpp
         src/util/platform/FFPlatform_windows.c
+        src/util/binary_windows.c
     )
 elseif(SunOS)
     list(APPEND LIBFASTFETCH_SRC
@@ -763,6 +787,7 @@ elseif(SunOS)
         src/detection/cpuusage/cpuusage_sunos.c
         src/detection/cursor/cursor_linux.c
         src/detection/bluetooth/bluetooth_nosupport.c
+        src/detection/bluetoothradio/bluetoothradio_nosupport.c
         src/detection/disk/disk_sunos.c
         src/detection/dns/dns_linux.c
         src/detection/physicaldisk/physicaldisk_nosupport.c
@@ -796,7 +821,7 @@ elseif(SunOS)
         src/detection/gamepad/gamepad_nosupport.c
         src/detection/media/media_linux.c
         src/detection/memory/memory_sunos.c
-        src/detection/monitor/monitor_nosupport.c
+        src/detection/monitor/monitor_linux.c
         src/detection/netio/netio_sunos.c
         src/detection/opengl/opengl_linux.c
         src/detection/os/os_sunos.c
@@ -818,7 +843,9 @@ elseif(SunOS)
         src/detection/de/de_linux.c
         src/detection/wmtheme/wmtheme_linux.c
         src/detection/camera/camera_nosupport.c
+        src/detection/zpool/zpool_linux.c
         src/util/platform/FFPlatform_unix.c
+        src/util/binary_linux.c
     )
 endif()
 
@@ -828,28 +855,30 @@ if(ENABLE_DIRECTX_HEADERS)
 endif()
 
 # Proprietary GPU driver APIs
-if(LINUX OR BSD OR WIN32)
+if(LINUX OR FreeBSD OR WIN32)
     list(APPEND LIBFASTFETCH_SRC src/detection/gpu/gpu_nvidia.c)
+    list(APPEND LIBFASTFETCH_SRC src/detection/gpu/gpu_mthreads.c)
 endif()
+
 if(WIN32)
     list(APPEND LIBFASTFETCH_SRC src/detection/gpu/gpu_intel.c)
     list(APPEND LIBFASTFETCH_SRC src/detection/gpu/gpu_amd.c)
 endif()
-if(LINUX)
-    list(APPEND LIBFASTFETCH_SRC src/detection/gpu/gpu_mthreads.c)
-endif()
 
 include(CheckFunctionExists)
 check_function_exists(wcwidth HAVE_WCWIDTH)
+
 if(NOT HAVE_WCWIDTH)
     list(APPEND LIBFASTFETCH_SRC src/3rdparty/mk_wcwidch/wcwidth.c)
 endif()
+
 if(LINUX)
     check_function_exists(statx HAVE_STATX)
 endif()
 
 if(ENABLE_SYSTEM_YYJSON)
     find_package(yyjson)
+
     if(yyjson_FOUND)
         message(STATUS "System provided yyjson is used")
     else()
@@ -868,7 +897,8 @@ add_library(libfastfetch OBJECT
 if(yyjson_FOUND)
     target_compile_definitions(libfastfetch PRIVATE FF_USE_SYSTEM_YYJSON)
     target_link_libraries(libfastfetch PRIVATE yyjson::yyjson)
-    # `target_link_libraries(yyjson::yyjson)` sets rpath implicitly
+
+# `target_link_libraries(yyjson::yyjson)` sets rpath implicitly
 else()
     # Used for dlopen finding dylibs installed by homebrew
     # `/opt/homebrew/lib` is not on in dlopen search path by default
@@ -879,27 +909,33 @@ endif()
 
 if(LINUX AND EXISTS "/lib/ld-musl-${CMAKE_HOST_SYSTEM_PROCESSOR}.so.1")
     execute_process(COMMAND "/lib/ld-musl-${CMAKE_HOST_SYSTEM_PROCESSOR}.so.1"
-                    ERROR_VARIABLE LD_MUSL_RESULT)
+        ERROR_VARIABLE LD_MUSL_RESULT)
+
     if("${LD_MUSL_RESULT}" MATCHES "Version ([0-9]+\\.[0-9]+\\.[0-9]+)")
         target_compile_definitions(libfastfetch PUBLIC FF_MUSL_VERSION="${CMAKE_MATCH_1}")
     endif()
 endif()
+
 if(APPLE AND EXISTS "/usr/bin/otool")
     execute_process(COMMAND /usr/bin/otool -L /usr/bin/otool
-                    OUTPUT_VARIABLE OTOOL_OTOOL_RESULT)
+        OUTPUT_VARIABLE OTOOL_OTOOL_RESULT)
+
     if("${OTOOL_OTOOL_RESULT}" MATCHES "libSystem\\.B\\.dylib \\(.*current version ([0-9]+\\.[0-9]+\\.[0-9]+)\\)")
         target_compile_definitions(libfastfetch PUBLIC FF_LIBSYSTEM_VERSION="${CMAKE_MATCH_1}")
     endif()
 endif()
-if(BSD AND EXISTS "/usr/local/bin/objdump")
+
+if(FreeBSD AND EXISTS "/usr/local/bin/objdump")
     execute_process(COMMAND /bin/sh -c "/usr/local/bin/objdump -T /lib/libc.so.* | grep 'FBSD_[^ )]*' -o | sort -Vru | head -1"
-                    OUTPUT_VARIABLE OBJDUMP_T_RESULT)
+        OUTPUT_VARIABLE OBJDUMP_T_RESULT)
+
     if("${OBJDUMP_T_RESULT}" MATCHES "FBSD_([0-9]+\\.[0-9]+)")
         target_compile_definitions(libfastfetch PUBLIC FF_FBSD_VERSION="${CMAKE_MATCH_1}")
     endif()
 endif()
 
 target_compile_definitions(libfastfetch PUBLIC _GNU_SOURCE _XOPEN_SOURCE __STDC_WANT_LIB_EXT1__=1 _FILE_OFFSET_BITS=64)
+
 if(WIN32)
     target_compile_definitions(libfastfetch PUBLIC WIN32_LEAN_AND_MEAN=1)
 elseif(APPLE)
@@ -920,10 +956,12 @@ if(NOT "${CUSTOM_PCI_IDS_PATH}" STREQUAL "")
     message(STATUS "Custom file path of pci.ids: ${CUSTOM_PCI_IDS_PATH}")
     target_compile_definitions(libfastfetch PRIVATE FF_CUSTOM_PCI_IDS_PATH=${CUSTOM_PCI_IDS_PATH})
 endif()
+
 if(NOT "${CUSTOM_AMDGPU_IDS_PATH}" STREQUAL "")
     message(STATUS "Custom file path of amdgpu.ids: ${CUSTOM_AMDGPU_IDS_PATH}")
     target_compile_definitions(libfastfetch PRIVATE FF_CUSTOM_AMDGPU_IDS_PATH=${CUSTOM_AMDGPU_IDS_PATH})
 endif()
+
 if(NOT "${CUSTOM_OS_RELEASE_PATH}" STREQUAL "")
     message(STATUS "Custom file path of os_release: ${CUSTOM_OS_RELEASE_PATH}")
     target_compile_definitions(libfastfetch PRIVATE FF_CUSTOM_OS_RELEASE_PATH=${CUSTOM_OS_RELEASE_PATH})
@@ -1059,10 +1097,6 @@ ff_lib_enable(OPENCL
     "OpenCL"
     "OpenCL"
 )
-ff_lib_enable(LIBNM
-    "libnm"
-    "libnm"
-)
 ff_lib_enable(FREETYPE
     "freetype2"
     "FreeType2"
@@ -1075,14 +1109,39 @@ ff_lib_enable(DDCUTIL
     "ddcutil"
     "Ddcutil"
 )
+ff_lib_enable(ELF
+    "libelf"
+    "libelf"
+)
 ff_lib_enable(DIRECTX_HEADERS
     "DirectX-Headers"
     "DirectX-Headers"
 )
 
+# The system <libzfs.h> is only usable on SunOS. We provide our local copy of it so it's always available.
+if(ENABLE_LIBZFS)
+    if(BINARY_LINK_TYPE STREQUAL "dlopen")
+        target_compile_definitions(libfastfetch PRIVATE FF_HAVE_LIBZFS=1)
+    else()
+        set(CMAKE_REQUIRED_LIBRARIES_BACKUP ${CMAKE_REQUIRED_LIBRARIES})
+        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} zfs)
+        check_function_exists("libzfs_init" LIBZFS_FOUND)
+        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_BACKUP})
+
+        if(NOT LIBZFS_FOUND)
+            message(STATUS "Library: missing: LIBZFS")
+        else()
+            message(STATUS "Library: found LIBZFS")
+            target_compile_definitions(libfastfetch PRIVATE FF_HAVE_LIBZFS=1)
+            target_link_libraries(libfastfetch PRIVATE zfs)
+        endif()
+    endif()
+endif()
+
 if(ENABLE_THREADS)
     target_compile_definitions(libfastfetch PRIVATE FF_HAVE_THREADS)
-    if(CMAKE_USE_PTHREADS_INIT) #Threads::Threads is not set for WIN32
+
+    if(CMAKE_USE_PTHREADS_INIT) # Threads::Threads is not set for WIN32
         target_link_libraries(libfastfetch PRIVATE Threads::Threads)
     endif()
 endif()
@@ -1127,8 +1186,9 @@ elseif(WIN32)
         PRIVATE "setupapi"
         PRIVATE "hid"
         PRIVATE "wtsapi32"
+        PRIVATE "imagehlp"
     )
-elseif(BSD)
+elseif(FreeBSD)
     target_link_libraries(libfastfetch
         PRIVATE "m"
         PRIVATE "usbhid"
@@ -1140,15 +1200,19 @@ elseif(SunOS)
         PRIVATE "socket"
         PRIVATE "kstat"
         PRIVATE "proc"
+        PRIVATE "zfs"
+        PRIVATE "nvpair"
     )
 elseif(ANDROID)
     CHECK_LIBRARY_EXISTS(-l:libandroid-wordexp.a wordexp "" HAVE_LIBANDROID_WORDEXP_STATIC)
+
     if(HAVE_LIBANDROID_WORDEXP_STATIC)
         target_link_libraries(libfastfetch
             PRIVATE -l:libandroid-wordexp.a
         )
     else()
         CHECK_LIBRARY_EXISTS(android-wordexp wordexp "" HAVE_LIBANDROID_WORDEXP)
+
         if(HAVE_LIBANDROID_WORDEXP)
             target_link_libraries(libfastfetch
                 PRIVATE android-wordexp
@@ -1173,6 +1237,7 @@ if(WIN32)
     set(CMAKE_CXX_STANDARD 20)
     include(CheckIncludeFileCXX)
     CHECK_INCLUDE_FILE_CXX("winrt/Windows.Foundation.h" HAVE_WINRT)
+
     if(HAVE_WINRT)
         add_library(ffwinrt MODULE src/detection/media/media_windows.dll.cpp)
         target_link_libraries(ffwinrt PRIVATE "RuntimeObject")
@@ -1181,13 +1246,65 @@ if(WIN32)
             PRIVATE "-static" # stdc++, winpthread, gcc_s, etc.
         )
     endif()
-        set(CMAKE_CXX_STANDARD 17)
+
+    set(CMAKE_CXX_STANDARD 17)
 endif()
 
-######################
-# Executable targets #
-######################
+if(FreeBSD)
+    set(CMAKE_REQUIRED_INCLUDES "/usr/local/include" "/usr/include")
+endif()
 
+if(LINUX OR FreeBSD)
+    CHECK_INCLUDE_FILE("linux/videodev2.h" HAVE_LINUX_VIDEODEV2)
+
+    if(HAVE_LINUX_VIDEODEV2)
+        target_compile_definitions(libfastfetch PRIVATE FF_HAVE_LINUX_VIDEODEV2=1)
+    endif()
+endif()
+
+if(LINUX)
+    CHECK_INCLUDE_FILE("linux/wireless.h" HAVE_LINUX_WIRELESS)
+
+    if(HAVE_LINUX_WIRELESS)
+        target_compile_definitions(libfastfetch PRIVATE FF_HAVE_LINUX_WIRELESS=1)
+    endif()
+endif()
+
+if(NOT WIN32)
+    CHECK_INCLUDE_FILE("utmpx.h" HAVE_UTMPX)
+
+    if(HAVE_UTMPX)
+        target_compile_definitions(libfastfetch PRIVATE FF_HAVE_UTMPX=1)
+    endif()
+
+    CHECK_INCLUDE_FILE("wordexp.h" HAVE_WORDEXP)
+
+    if(HAVE_WORDEXP)
+        target_compile_definitions(libfastfetch PRIVATE FF_HAVE_WORDEXP=1)
+    endif()
+
+    if(ENABLE_THREADS AND CMAKE_USE_PTHREADS_INIT)
+        CHECK_INCLUDE_FILE("pthread_np.h" HAVE_PTHREAD_NP)
+
+        if(HAVE_PTHREAD_NP)
+            target_compile_definitions(libfastfetch PRIVATE FF_HAVE_PTHREAD_NP=1)
+            set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} pthread_np.h)
+        endif()
+
+        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} Threads::Threads)
+        check_function_exists("pthread_timedjoin_np" HAVE_TIMEDJOIN_NP)
+
+        if(HAVE_TIMEDJOIN_NP)
+            target_compile_definitions(libfastfetch PRIVATE FF_HAVE_TIMEDJOIN_NP=1)
+        else()
+            message(WARNING "pthread_timedjoin_np was not found; networking timeout will not work")
+        endif()
+    endif()
+endif()
+
+# #####################
+# Executable targets #
+# #####################
 add_executable(fastfetch
     src/fastfetch.c
 )
@@ -1242,11 +1359,10 @@ if(BINARY_LINK_TYPE STREQUAL "static")
     target_link_options(flashfetch PRIVATE "-static")
 endif()
 
-###################
+# ##################
 # Testing targets #
-###################
-
-if (BUILD_TESTS)
+# ##################
+if(BUILD_TESTS)
     add_executable(fastfetch-test-strbuf
         tests/strbuf.c
     )
@@ -1261,15 +1377,26 @@ if (BUILD_TESTS)
         PRIVATE libfastfetch
     )
 
+    add_executable(fastfetch-test-format
+        tests/format.c
+    )
+    target_link_libraries(fastfetch-test-format
+        PRIVATE libfastfetch
+    )
+
+    if(yyjson_FOUND)
+        target_compile_definitions(fastfetch-test-format PRIVATE FF_USE_SYSTEM_YYJSON)
+    endif()
+
     enable_testing()
     add_test(NAME test-strbuf COMMAND fastfetch-test-strbuf)
     add_test(NAME test-list COMMAND fastfetch-test-list)
+    add_test(NAME test-format COMMAND fastfetch-test-format)
 endif()
 
-##################
+# #################
 # install target #
-##################
-
+# #################
 include(GNUInstallDirs)
 
 install(
@@ -1277,7 +1404,7 @@ install(
     DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
-if (TARGET ffwinrt)
+if(TARGET ffwinrt)
     install(
         TARGETS ffwinrt
         DESTINATION "${CMAKE_INSTALL_BINDIR}"
@@ -1288,6 +1415,12 @@ install(
     FILES "${CMAKE_SOURCE_DIR}/completions/${CMAKE_PROJECT_NAME}.bash"
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/bash-completion/completions"
     RENAME "${CMAKE_PROJECT_NAME}"
+)
+
+install(
+    FILES "${CMAKE_SOURCE_DIR}/completions/${CMAKE_PROJECT_NAME}.zsh"
+    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/zsh/site-functions"
+    RENAME "_${CMAKE_PROJECT_NAME}"
 )
 
 install(
@@ -1313,17 +1446,18 @@ install(
     DESTINATION "${CMAKE_INSTALL_MANDIR}/man1"
 )
 
-##################
+# #################
 # package target #
-##################
-
+# #################
 set(CPACK_GENERATOR "TGZ;ZIP")
+
 if(APPLE)
     string(TOLOWER "${CMAKE_PROJECT_NAME}-macos-universal" CPACK_PACKAGE_FILE_NAME)
 else() # We don't use this in Windows
     if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
         set(CMAKE_SYSTEM_PROCESSOR "amd64")
     endif()
+
     if(IS_MUSL)
         string(TOLOWER "${CMAKE_PROJECT_NAME}-musl-${CMAKE_SYSTEM_PROCESSOR}" CPACK_PACKAGE_FILE_NAME)
     else()
@@ -1333,6 +1467,7 @@ endif()
 
 if(LINUX)
     find_program(HAVE_DPKG "dpkg")
+
     if(HAVE_DPKG)
         set(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
 
@@ -1344,6 +1479,7 @@ if(LINUX)
                 COMMAND getconf GNU_LIBC_VERSION
                 OUTPUT_VARIABLE GLIBC_VERSION
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
+
             if(GLIBC_VERSION)
                 STRING(REPLACE "glibc " "" GLIBC_VERSION ${GLIBC_VERSION})
                 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= ${GLIBC_VERSION})")
@@ -1355,6 +1491,7 @@ if(LINUX)
     endif()
 
     find_program(HAVE_RPMBUILD "rpmbuild")
+
     if(HAVE_RPMBUILD)
         set(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
 

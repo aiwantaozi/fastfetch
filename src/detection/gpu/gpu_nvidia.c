@@ -13,8 +13,8 @@ struct FFNvmlData {
     FF_LIBRARY_SYMBOL(nvmlDeviceGetMemoryInfo)
     FF_LIBRARY_SYMBOL(nvmlDeviceGetNumGpuCores)
     FF_LIBRARY_SYMBOL(nvmlDeviceGetMaxClockInfo)
-    FF_LIBRARY_SYMBOL(nvmlDeviceGetBrand)
     FF_LIBRARY_SYMBOL(nvmlDeviceGetUtilizationRates)
+    FF_LIBRARY_SYMBOL(nvmlDeviceGetBrand)
     FF_LIBRARY_SYMBOL(nvmlDeviceGetUUID)
     FF_LIBRARY_SYMBOL(nvmlDeviceGetIndex)
     FF_LIBRARY_SYMBOL(nvmlDeviceGetName)
@@ -80,7 +80,7 @@ const char* ffDetectNvidiaGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverR
     if (!nvmlData.inited)
     {
         nvmlData.inited = true;
-        FF_LIBRARY_LOAD(libnvml, NULL, "dlopen nvml failed", soName , 1);
+        FF_LIBRARY_LOAD(libnvml, "dlopen nvml failed", soName , 1);
         FF_LIBRARY_LOAD_SYMBOL_MESSAGE(libnvml, nvmlInit_v2)
         FF_LIBRARY_LOAD_SYMBOL_MESSAGE(libnvml, nvmlShutdown)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetCount_v2)
@@ -92,8 +92,8 @@ const char* ffDetectNvidiaGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverR
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetMemoryInfo)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetNumGpuCores)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetMaxClockInfo)
-        FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetBrand)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetUtilizationRates)
+        FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetBrand)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetUUID)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetIndex)
         FF_LIBRARY_LOAD_SYMBOL_VAR_MESSAGE(libnvml, nvmlData, nvmlDeviceGetName)
@@ -210,10 +210,20 @@ const char* ffDetectNvidiaGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverR
         nvmlData.ffnvmlDeviceGetNumGpuCores(device, result.coreCount);
 
     if (result.frequency)
+        nvmlData.ffnvmlDeviceGetMaxClockInfo(device, NVML_CLOCK_GRAPHICS, result.frequency);
+
+    if (result.coreUsage)
     {
-        uint32_t clockMHz;
-        if (nvmlData.ffnvmlDeviceGetMaxClockInfo(device, NVML_CLOCK_GRAPHICS, &clockMHz) == NVML_SUCCESS)
-            *result.frequency = clockMHz / 1000.;
+        nvmlUtilization_t utilization;
+        if (nvmlData.ffnvmlDeviceGetUtilizationRates(device, &utilization) == NVML_SUCCESS)
+            *result.coreUsage = utilization.gpu;
+    }
+
+    if (result.name)
+    {
+        char name[NVML_DEVICE_NAME_V2_BUFFER_SIZE];
+        if (nvmlData.ffnvmlDeviceGetName(device, name, sizeof(name)) == NVML_SUCCESS)
+            ffStrbufSetS(result.name, name);
     }
 
     if (result.coreUtilizationRate)

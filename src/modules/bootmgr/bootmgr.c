@@ -40,10 +40,10 @@ void ffPrintBootmgr(FFBootmgrOptions* options)
     else
     {
         FF_PRINT_FORMAT_CHECKED(FF_BOOTMGR_MODULE_NAME, 0, &options->moduleArgs, FF_PRINT_TYPE_DEFAULT, FF_BOOTMGR_NUM_FORMAT_ARGS, ((FFformatarg[]) {
-            {FF_FORMAT_ARG_TYPE_STRBUF, &bootmgr.name, "name"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &bootmgr.firmware, "firmware-path"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &firmwareName, "firmware-name"},
-            {FF_FORMAT_ARG_TYPE_BOOL, &bootmgr.secureBoot, "secure-boot"},
+            FF_FORMAT_ARG(bootmgr.name, "name"),
+            FF_FORMAT_ARG(bootmgr.firmware, "firmware-path"),
+            FF_FORMAT_ARG(firmwareName, "firmware-name"),
+            FF_FORMAT_ARG(bootmgr.secureBoot, "secure-boot"),
         }));
     }
 
@@ -134,7 +134,7 @@ void ffInitBootmgrOptions(FFBootmgrOptions* options)
         ffPrintBootmgrHelpFormat,
         ffGenerateBootmgrJsonConfig
     );
-    ffOptionInitModuleArg(&options->moduleArgs);
+    ffOptionInitModuleArg(&options->moduleArgs, "");
 }
 
 void ffDestroyBootmgrOptions(FFBootmgrOptions* options)

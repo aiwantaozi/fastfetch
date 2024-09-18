@@ -6,6 +6,7 @@ void ffOptionsInitModules(FFOptionsModules* options)
     ffInitBatteryOptions(&options->battery);
     ffInitBiosOptions(&options->bios);
     ffInitBluetoothOptions(&options->bluetooth);
+    ffInitBluetoothRadioOptions(&options->bluetoothRadio);
     ffInitBoardOptions(&options->board);
     ffInitBootmgrOptions(&options->bootmgr);
     ffInitBreakOptions(&options->break_);
@@ -70,6 +71,7 @@ void ffOptionsInitModules(FFOptionsModules* options)
     ffInitWallpaperOptions(&options->wallpaper);
     ffInitWeatherOptions(&options->weather);
     ffInitWifiOptions(&options->wifi);
+    ffInitZpoolOptions(&options->zpool);
 }
 
 void ffOptionsDestroyModules(FFOptionsModules* options)
@@ -77,6 +79,7 @@ void ffOptionsDestroyModules(FFOptionsModules* options)
     ffDestroyBatteryOptions(&options->battery);
     ffDestroyBiosOptions(&options->bios);
     ffDestroyBluetoothOptions(&options->bluetooth);
+    ffDestroyBluetoothRadioOptions(&options->bluetoothRadio);
     ffDestroyBoardOptions(&options->board);
     ffDestroyBootmgrOptions(&options->bootmgr);
     ffDestroyBreakOptions(&options->break_);
@@ -141,4 +144,5 @@ void ffOptionsDestroyModules(FFOptionsModules* options)
     ffDestroyWallpaperOptions(&options->wallpaper);
     ffDestroyWeatherOptions(&options->weather);
     ffDestroyWifiOptions(&options->wifi);
+    ffDestroyZpoolOptions(&options->zpool);
 }

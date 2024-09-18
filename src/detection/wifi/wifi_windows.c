@@ -43,7 +43,7 @@ static void convertIfStateToString(WLAN_INTERFACE_STATE state, FFstrbuf* result)
 
 const char* ffDetectWifi(FFlist* result)
 {
-    FF_LIBRARY_LOAD(wlanapi, NULL, "dlopen wlanapi"FF_LIBRARY_EXTENSION" failed", "wlanapi"FF_LIBRARY_EXTENSION, 1)
+    FF_LIBRARY_LOAD(wlanapi, "dlopen wlanapi" FF_LIBRARY_EXTENSION " failed", "wlanapi" FF_LIBRARY_EXTENSION, 1)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(wlanapi, WlanOpenHandle)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(wlanapi, WlanEnumInterfaces)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(wlanapi, WlanQueryInterface)
@@ -76,7 +76,7 @@ const char* ffDetectWifi(FFlist* result)
         ffStrbufInit(&item->inf.status);
         ffStrbufInit(&item->conn.status);
         ffStrbufInit(&item->conn.ssid);
-        ffStrbufInit(&item->conn.macAddress);
+        ffStrbufInit(&item->conn.bssid);
         ffStrbufInit(&item->conn.protocol);
         ffStrbufInit(&item->conn.security);
         item->conn.signalQuality = 0.0/0.0;
@@ -107,8 +107,8 @@ const char* ffDetectWifi(FFlist* result)
             (const char *)connInfo->wlanAssociationAttributes.dot11Ssid.ucSSID);
 
         for (size_t i = 0; i < sizeof(connInfo->wlanAssociationAttributes.dot11Bssid); i++)
-            ffStrbufAppendF(&item->conn.macAddress, "%.2X-", connInfo->wlanAssociationAttributes.dot11Bssid[i]);
-        ffStrbufTrimRight(&item->conn.macAddress, '-');
+            ffStrbufAppendF(&item->conn.bssid, "%.2X-", connInfo->wlanAssociationAttributes.dot11Bssid[i]);
+        ffStrbufTrimRight(&item->conn.bssid, '-');
 
         switch (connInfo->wlanAssociationAttributes.dot11PhyType)
         {

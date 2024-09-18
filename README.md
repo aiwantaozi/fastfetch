@@ -30,17 +30,23 @@ There are [screenshots on different platforms](https://github.com/fastfetch-cli/
 Some distros packaged an outdated fastfetch version. Older version receive no support, so please try always to use the latest version.
 
 * Ubuntu: [`ppa:zhangsongcui3371/fastfetch`](https://launchpad.net/~zhangsongcui3371/+archive/ubuntu/fastfetch) (for Ubuntu 22.04 or newer)
-* Debian: `sudo apt install fastfetch` (for Debian 13 or newer)
+* Debian: `apt install fastfetch` (for Debian 13 or newer)
 * Debian / Ubuntu: Download `fastfetch-linux-<proper architecture>.deb` from [Github release page](https://github.com/fastfetch-cli/fastfetch/releases/latest) and double-click it (for Ubuntu 20.04 or newer and Debian 11 or newer).
-* Arch Linux: `sudo pacman -S fastfetch`
-* Fedora: `sudo dnf install fastfetch`
-* Gentoo: `sudo emerge --ask app-misc/fastfetch`
+* Arch Linux: `pacman -S fastfetch`
+* Fedora: `dnf install fastfetch`
+* Gentoo: `emerge --ask app-misc/fastfetch`
 * Alpine: `apk add --upgrade fastfetch`
 * NixOS: `nix-shell -p fastfetch`
-* openSUSE: `sudo zypper install fastfetch`
-* ALT Linux: `sudo apt-get install fastfetch`
+* openSUSE: `zypper install fastfetch`
+* ALT Linux: `apt-get install fastfetch`
+* Exherbo: `cave resolve --execute app-misc/fastfetch`
+* GNU Guix: `guix install fastfetch`
+* Solus: `eopkg install fastfetch`
+* Slackware: `sbopkg -i fastfetch`
+* Void Linux: `xbps-install fastfetch`
+* Venom Linux: `scratch install fastfetch`
 
-Replace sudo with doas depending on what you use.
+You may need `sudo`, `doas` or `sup` to run these commands.
 
 [See also if fastfetch has been packaged for your favorite Linux distro](#Packaging).
 
@@ -54,8 +60,9 @@ If fastfetch is not packaged for your distro or an outdated version is packaged,
 ### Windows
 
 * [scoop](https://scoop.sh/#/apps?q=fastfetch): `scoop install fastfetch`
+* [Chocolatey](https://community.chocolatey.org/packages/fastfetch): `choco install fastfetch`
 * [winget](https://github.com/microsoft/winget-pkgs/tree/master/manifests/f/Fastfetch-cli/Fastfetch): `winget install fastfetch`
-* [MSYS2 MinGW](https://github.com/msys2/MINGW-packages/tree/master/mingw-w64-fastfetch): `pacman -S mingw-w64-<subsystem>-<arch>-fastfetch`
+* [MSYS2 MinGW](https://packages.msys2.org/base/mingw-w64-fastfetch): `pacman -S mingw-w64-<subsystem>-<arch>-fastfetch`
 
 You may also download the program directly from [the GitHub releases page](https://github.com/fastfetch-cli/fastfetch/releases/latest) in the form of an archive file.
 
@@ -74,7 +81,7 @@ See Wiki: https://github.com/fastfetch-cli/fastfetch/wiki/Building
 ## Usage
 
 * Run it with default configuration: `fastfetch`
-* Run it with [all supported modules](https://github.com/fastfetch-cli/fastfetch/wiki/Support+Status#available-modules) and find what you interest: `fastfetch -c all.jsonc`
+* Run it with [all supported modules](https://github.com/fastfetch-cli/fastfetch/wiki/Support+Status#available-modules) and find what interests you: `fastfetch -c all.jsonc`
 * Find all data that fastfetch detects: `fastfetch -s <module> --format json`
 * Display help messages: `fastfetch --help`
 * Generate config file based on command line arguments: `fastfetch --arg1 --arg2 --gen-config`
@@ -126,6 +133,12 @@ Fastfetch uses JSON (with comments) for configuration. I suggest you use an IDE 
 
 Alternatively, you can refer to the presets in [`presets` directory](https://github.com/fastfetch-cli/fastfetch/tree/dev/presets).
 
+The **correct** way to edit the configuration:
+
+This is an example that [changes size prefix from MiB / GiB to MB / GB](https://github.com/fastfetch-cli/fastfetch/discussions/1014). Editor used: [helix](https://github.com/helix-editor/helix)
+
+[![asciicast](https://asciinema.org/a/1uF6sTPGKrHKI1MVaFcikINSQ.svg)](https://asciinema.org/a/1uF6sTPGKrHKI1MVaFcikINSQ)
+
 ### Q: I WANT THE DOCUMENTATION!
 
 [Here is the documentation](https://github.com/fastfetch-cli/fastfetch/wiki/Json-Schema). It is generated from [JSON schema](https://github.com/fastfetch-cli/fastfetch/blob/dev/doc/json_schema.json) but you won't like it.
@@ -168,6 +181,10 @@ This issue usually happens when using fastfetch with `p10k`. There are known inc
 The p10k doc clearly states that you should NOT print anything to stdout after `p10k-instant-prompt` is initialized. You should either put `fastfetch` before initialization of `p10k-instant-prompt` (recommended)
 
 You can always use `fastfetch --pipe false` to force fastfetch running in colorful mode.
+
+### Q: Why do fastfetch and neofetch show different memory usage result?
+
+See [#1096](https://github.com/fastfetch-cli/fastfetch/issues/1096).
 
 ### Q: I want feature A / B / C. Will fastfetch support it?
 

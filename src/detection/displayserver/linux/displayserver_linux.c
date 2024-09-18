@@ -7,6 +7,43 @@
     #include "common/settings.h"
 #endif
 
+static void getWMProtocolNameFromEnv(FFDisplayServerResult* result)
+{
+    const char* env = getenv("XDG_SESSION_TYPE");
+    if(env)
+    {
+        if(ffStrEqualsIgnCase(env, "wayland"))
+            ffStrbufSetS(&result->wmProtocolName, FF_WM_PROTOCOL_WAYLAND);
+        else if(ffStrEqualsIgnCase(env, "x11") || ffStrEqualsIgnCase(env, "xorg"))
+            ffStrbufSetS(&result->wmProtocolName, FF_WM_PROTOCOL_X11);
+        else if(ffStrEqualsIgnCase(env, "tty"))
+            ffStrbufSetS(&result->wmProtocolName, FF_WM_PROTOCOL_TTY);
+        else
+            ffStrbufSetS(&result->wmProtocolName, env);
+
+        return;
+    }
+
+    if(getenv("WAYLAND_DISPLAY") != NULL || getenv("WAYLAND_SOCKET") != NULL)
+    {
+        ffStrbufSetStatic(&result->wmProtocolName, FF_WM_PROTOCOL_WAYLAND);
+        return;
+    }
+
+    if(getenv("DISPLAY") != NULL) // XWayland also set this
+    {
+        ffStrbufSetStatic(&result->wmProtocolName, FF_WM_PROTOCOL_X11);
+        return;
+    }
+
+    env = getenv("TERM");
+    if(ffStrSet(env) && ffStrEqualsIgnCase(env, "linux"))
+    {
+        ffStrbufSetStatic(&result->wmProtocolName, FF_WM_PROTOCOL_TTY);
+        return;
+    }
+}
+
 void ffConnectDisplayServerImpl(FFDisplayServerResult* ds)
 {
     if (instance.config.general.dsForceDrm == FF_DS_FORCE_DRM_TYPE_FALSE)
@@ -50,15 +87,21 @@ void ffConnectDisplayServerImpl(FFDisplayServerResult* ds)
                 if (ffSettingsGetFreeBSDKenv("screen.height", &buf))
                 {
                     uint32_t height = (uint32_t) ffStrbufToUInt(&buf, 0);
-                    ffdsAppendDisplay(ds, width, height, 0, 0, 0, 0, NULL, FF_DISPLAY_TYPE_UNKNOWN, false, 0);
+                    ffdsAppendDisplay(ds, width, height, 0, 0, 0, 0, NULL, FF_DISPLAY_TYPE_UNKNOWN, false, 0, 0, 0);
                 }
             }
         }
     }
     #endif
 
-    //This fills in missing information about WM / DE by using env vars and iterating processes
-    ffdsDetectWMDE(ds);
+    if (ds->wmProtocolName.length == 0)
+        getWMProtocolNameFromEnv(ds);
+
+    if(!ffStrbufEqualS(&ds->wmProtocolName, FF_WM_PROTOCOL_TTY))
+    {
+        //This fills in missing information about WM / DE by using env vars and iterating processes
+        ffdsDetectWMDE(ds);
+    }
 }
 
 bool ffdsMatchDrmConnector(const char* connName, FFstrbuf* edidName)
@@ -68,7 +111,7 @@ bool ffdsMatchDrmConnector(const char* connName, FFstrbuf* edidName)
     // However I can't find a better method to get the edid data
     const char* drmDirPath = "/sys/class/drm/";
 
-    DIR* dirp = opendir(drmDirPath);
+    FF_AUTO_CLOSE_DIR DIR* dirp = opendir(drmDirPath);
     if(dirp == NULL)
         return false;
 
@@ -90,13 +133,25 @@ bool ffdsMatchDrmConnector(const char* connName, FFstrbuf* edidName)
             {
                 ffStrbufClear(edidName);
                 ffEdidGetName(edidData, edidName);
-                closedir(dirp);
                 return true;
             }
             break;
         }
     }
     ffStrbufClear(edidName);
-    closedir(dirp);
     return false;
+}
+
+FFDisplayType ffdsGetDisplayType(const char* name)
+{
+    if(ffStrStartsWith(name, "eDP-") || ffStrStartsWith(name, "LVDS-"))
+        return FF_DISPLAY_TYPE_BUILTIN;
+    else if(ffStrStartsWith(name, "HDMI-") ||
+            ffStrStartsWith(name, "DP-") ||
+            ffStrStartsWith(name, "DisplayPort-") ||
+            ffStrStartsWith(name, "DVI-") ||
+            ffStrStartsWith(name, "VGA-"))
+        return FF_DISPLAY_TYPE_EXTERNAL;
+
+    return FF_DISPLAY_TYPE_UNKNOWN;
 }

@@ -46,10 +46,10 @@ void ffPrintWM(FFWMOptions* options)
     else
     {
         FF_PRINT_FORMAT_CHECKED(FF_WM_MODULE_NAME, 0, &options->moduleArgs, FF_PRINT_TYPE_DEFAULT, FF_WM_NUM_FORMAT_ARGS, ((FFformatarg[]){
-            {FF_FORMAT_ARG_TYPE_STRBUF, &result->wmProcessName, "process-name"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &result->wmPrettyName, "pretty-name"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &result->wmProtocolName, "protocol-name"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &pluginName, "plugin-name"},
+            FF_FORMAT_ARG(result->wmProcessName, "process-name"),
+            FF_FORMAT_ARG(result->wmPrettyName, "pretty-name"),
+            FF_FORMAT_ARG(result->wmProtocolName, "protocol-name"),
+            FF_FORMAT_ARG(pluginName, "plugin-name"),
         }));
     }
 }
@@ -148,7 +148,7 @@ void ffInitWMOptions(FFWMOptions* options)
         ffPrintWMHelpFormat,
         ffGenerateWMJsonConfig
     );
-    ffOptionInitModuleArg(&options->moduleArgs);
+    ffOptionInitModuleArg(&options->moduleArgs, "");
     options->detectPlugin = false;
 }
 

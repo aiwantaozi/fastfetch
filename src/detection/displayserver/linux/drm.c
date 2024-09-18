@@ -37,7 +37,7 @@ static const char* drmParseSysfs(FFDisplayServerResult* result)
             continue;
         }
 
-        unsigned width = 0, height = 0;
+        unsigned width = 0, height = 0, physicalWidth = 0, physicalHeight = 0;
         double refreshRate = 0;
         FF_STRBUF_AUTO_DESTROY name = ffStrbufCreate();
 
@@ -49,6 +49,7 @@ static const char* drmParseSysfs(FFDisplayServerResult* result)
         {
             ffEdidGetName(edidData, &name);
             ffEdidGetPreferredResolutionAndRefreshRate(edidData, &width, &height, &refreshRate);
+            ffEdidGetPhysicalSize(edidData, &physicalWidth, &physicalHeight);
         }
         else
         {
@@ -78,7 +79,9 @@ static const char* drmParseSysfs(FFDisplayServerResult* result)
             &name,
             FF_DISPLAY_TYPE_UNKNOWN,
             false,
-            0
+            0,
+            physicalWidth,
+            physicalHeight
         );
 
         ffStrbufSubstrBefore(&drmDir, drmDirLength);
@@ -196,7 +199,7 @@ static const char* drmGetNameByConnId(uint32_t connId, FFstrbuf* name)
 
 static const char* drmConnectLibdrm(FFDisplayServerResult* result)
 {
-    FF_LIBRARY_LOAD(libdrm, &instance.config.library.libdrm, "dlopen libdrm" FF_LIBRARY_EXTENSION " failed", "libdrm" FF_LIBRARY_EXTENSION, 2)
+    FF_LIBRARY_LOAD(libdrm, "dlopen libdrm" FF_LIBRARY_EXTENSION " failed", "libdrm" FF_LIBRARY_EXTENSION, 2)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(libdrm, drmGetDevices)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(libdrm, drmModeGetResources)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(libdrm, drmModeGetConnectorCurrent)
@@ -217,6 +220,8 @@ static const char* drmConnectLibdrm(FFDisplayServerResult* result)
     if (nDevices < 0)
         return "drmGetDevices() failed";
 
+    FF_STRBUF_AUTO_DESTROY name = ffStrbufCreate();
+
     for (int iDev = 0; iDev < nDevices; ++iDev)
     {
         drmDevice* dev = devices[iDev];
@@ -225,6 +230,13 @@ static const char* drmConnectLibdrm(FFDisplayServerResult* result)
             continue;
 
         const char* path = dev->nodes[DRM_NODE_PRIMARY];
+
+        ffStrbufSetF(&name, "/sys/class/drm/%s/device/power/runtime_status", strrchr(path, '/') + 1);
+
+        char buffer[8] = "";
+        if (ffReadFileData(name.chars, strlen("suspend"), buffer) > 0 && ffStrStartsWith(buffer, "suspend"))
+            continue;
+
         FF_AUTO_CLOSE_FD int fd = open(path, O_RDONLY | O_CLOEXEC);
         if (fd < 0)
             continue;
@@ -289,7 +301,8 @@ static const char* drmConnectLibdrm(FFDisplayServerResult* result)
                     }
                 }
 
-                FF_STRBUF_AUTO_DESTROY name = ffStrbufCreate();
+
+                ffStrbufClear(&name);
 
                 for (int iProp = 0; iProp < conn->count_props; ++iProp)
                 {
@@ -339,12 +352,14 @@ static const char* drmConnectLibdrm(FFDisplayServerResult* result)
                     0,
                     0,
                     &name,
-                    conn->connector_type == DRM_MODE_CONNECTOR_eDP
+                    conn->connector_type == DRM_MODE_CONNECTOR_eDP || conn->connector_type == DRM_MODE_CONNECTOR_LVDS
                         ? FF_DISPLAY_TYPE_BUILTIN
-                        : conn->connector_type == DRM_MODE_CONNECTOR_HDMIA || conn->connector_type == DRM_MODE_CONNECTOR_HDMIB
+                        : conn->connector_type == DRM_MODE_CONNECTOR_HDMIA || conn->connector_type == DRM_MODE_CONNECTOR_HDMIB || conn->connector_type == DRM_MODE_CONNECTOR_DisplayPort
                             ? FF_DISPLAY_TYPE_EXTERNAL : FF_DISPLAY_TYPE_UNKNOWN,
                     false,
-                    conn->connector_id
+                    conn->connector_id,
+                    conn->mmWidth,
+                    conn->mmHeight
                 );
             }
 
@@ -361,17 +376,19 @@ static const char* drmConnectLibdrm(FFDisplayServerResult* result)
 
 #endif
 
-void ffdsConnectDrm(FFDisplayServerResult* result)
+const char* ffdsConnectDrm(FFDisplayServerResult* result)
 {
     #ifdef FF_HAVE_DRM
     if (instance.config.general.dsForceDrm != FF_DS_FORCE_DRM_TYPE_SYSFS_ONLY)
     {
         if (drmConnectLibdrm(result) == NULL)
-            return;
+            return NULL;
     }
     #endif
 
     #ifdef __linux__
-    drmParseSysfs(result);
+    return drmParseSysfs(result);
     #endif
+
+    return "fastfetch was compiled without drm support";
 }

@@ -1,3 +1,4 @@
+// Designed for Arch Linux
 // Modified from: https://github.com/fastfetch-cli/fastfetch/pull/1025#issuecomment-2177566138
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
@@ -12,7 +13,10 @@
         "color": {
             "separator": "blue"
         },
-        "separator": " | "
+        "separator": " | ",
+        "constants": [
+            ">-----------<+>---------------------------------------------<"
+        ]
     },
     "modules": [
         {
@@ -22,7 +26,7 @@
         },
         {
             "type": "custom",
-            "format": ">-----------<+>------------------------------------------<",
+            "format": "{$1}",
             "outputColor": "separator"
         },
         {
@@ -57,7 +61,7 @@
         },
         {
             "type": "custom",
-            "format": ">-----------<+>------------------------------------------<",
+            "format": "{$1}",
             "outputColor": "separator"
         },
         {
@@ -97,7 +101,7 @@
         },
         {
             "type": "custom",
-            "format": ">-----------<+>------------------------------------------<",
+            "format": "{$1}",
             "outputColor": "separator"
         },
         "break",

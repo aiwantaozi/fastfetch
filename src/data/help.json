@@ -506,6 +506,27 @@
             }
         },
         {
+            "long": "key-padding-left",
+            "desc": "Set the left padding of keys to <num> characters",
+            "arg": {
+                "type": "num"
+            }
+        },
+        {
+            "long": "key-type",
+            "desc": "Set whether to show icon before string keys",
+            "arg": {
+                "type": "enum",
+                "enum": {
+                    "none": "Disable keys",
+                    "string": "Show string",
+                    "icon": "Show icon (requires newest nerd font)",
+                    "both": "Show both icon and string"
+                },
+                "default": "string"
+            }
+        },
+        {
             "long": "bright-color",
             "desc": "Set if the keys, title and ASCII logo should be printed in bright color",
             "arg": {
@@ -547,19 +568,6 @@
                 "type": "bool",
                 "optional": true,
                 "default": false
-            }
-        },
-        {
-            "long": "binary-prefix",
-            "desc": "Set the binary prefix to used",
-            "arg": {
-                "type": "enum",
-                "enum": {
-                    "IEC": "1024 Bytes = 1 KiB, 1024 KiB = 1 MiB, ...",
-                    "SI": "1000 Bytes = 1 KB, 1000 KB = 1 MB, ...",
-                    "JEDEC": "1024 Bytes = 1 kB, 1024 kB = 1 MB, ..."
-                },
-                "default": "IEC"
             }
         },
         {
@@ -670,6 +678,19 @@
             }
         },
         {
+            "long": "size-binary-prefix",
+            "desc": "Set the binary prefix to used when formatting sizes",
+            "arg": {
+                "type": "enum",
+                "enum": {
+                    "IEC": "1024 Bytes = 1 KiB, 1024 KiB = 1 MiB, ...",
+                    "SI": "1000 Bytes = 1 KB, 1000 KB = 1 MB, ...",
+                    "JEDEC": "1024 Bytes = 1 kB, 1024 kB = 1 MB, ..."
+                },
+                "default": "IEC"
+            }
+        },
+        {
             "long": "size-max-prefix",
             "desc": "Set the largest binary prefix to use when formatting sizes",
             "arg": {
@@ -686,6 +707,14 @@
                     "YB": "YiB"
                 },
                 "default": "YB"
+            }
+        },
+        {
+            "long": "freq-ndigits",
+            "desc": "Set the number of digits to keep after the decimal point when printing CPU / GPU frequency in GHz",
+            "arg": {
+                "type": "num",
+                "default": 2
             }
         },
         {
@@ -737,177 +766,6 @@
             }
         }
     ],
-    "Library path": [
-        {
-            "long": "lib-vulkan",
-            "desc": "Vulkan module & fallback for GPU output",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-wayland",
-            "desc": "Better display performance and output in wayland sessions",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-xcb-randr",
-            "desc": "X11 sessions for better display detection and faster WM detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-xcb",
-            "desc": "X11 sessions for better display detection and faster WM detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-xrandr",
-            "desc": "X11 sessions for better display detection and faster WM detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-x11",
-            "desc": "X11 sessions for better display detection and faster WM detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-drm",
-            "desc": "Used for fast resolution and refresh rate detection",
-            "remark": "Linux only",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-gio",
-            "desc": "Needed for values that are only stored GSettings",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-dconf",
-            "desc": "Needed for values that are only stored in DConf + Fallback for GSettings",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-dbus",
-            "desc": "Bluetooth, Player & Media detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-xfconf",
-            "desc": "Needed for XFWM theme and XFCE Terminal font",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-sqlite3",
-            "desc": "Needed for pkg & rpm package count",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-rpm",
-            "desc": "Slower fallback for rpm package count",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-imagemagick",
-            "desc": "Images in terminal using sixel or kitty graphics protocol",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-z",
-            "desc": "Libz. Faster image output when using kitty graphics protocol",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-chafa",
-            "desc": "Image output as ascii art",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-egl",
-            "desc": "Needed by the OpenGL module for gl context creation",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-glx",
-            "desc": "Needed by the OpenGL module for gl context creation",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-osmesa",
-            "desc": "Needed by the OpenGL module for gl context creation",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-opencl",
-            "desc": "OpenCL module",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-pulse",
-            "desc": "Pulseaudio. Used for Sound detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-nm",
-            "desc": "NetworkManager. Used for Wifi detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-freetype",
-            "desc": "Used for Termux font detection",
-            "arg": {
-                "type": "path"
-            }
-        },
-        {
-            "long": "lib-ddcutil",
-            "desc": "Used for brightness detection of external displays",
-            "arg": {
-                "type": "path"
-            }
-        }
-    ],
     "Module specific": [
         {
             "long": "title-fqdn",
@@ -947,7 +805,7 @@
         },
         {
             "long": "separator-string",
-            "desc": "Set the string printed by the separator module",
+            "desc": "Set the string to be printed by the separator line",
             "arg": {
                 "type": "str",
                 "default": "-"
@@ -955,10 +813,19 @@
         },
         {
             "long": "separator-output-color",
-            "desc": "Set the color of the separator module",
+            "desc": "Set the color of the separator line",
             "arg": {
                 "type": "color",
                 "default": "default"
+            }
+        },
+        {
+            "long": "separator-length",
+            "desc": "Set the length of the separator line",
+            "remark": "Set to 0 to automatically calculate it with the title length",
+            "arg": {
+                "type": "num",
+                "default": "0"
             }
         },
         {
@@ -1166,14 +1033,6 @@
                 "type": "bool",
                 "optional": true,
                 "default": false
-            }
-        },
-        {
-            "long": "cpu-freq-ndigits",
-            "desc": "Set the number of digits to keep after the decimal point when printing CPU frequency",
-            "arg": {
-                "type": "num",
-                "default": 2
             }
         },
         {
@@ -1518,6 +1377,15 @@
             }
         },
         {
+            "long": "command-param",
+            "desc": "Set the parameter used when starting the shell",
+            "remark": "Due to the difference of how OSes handle command line parameters, Windows will parse whitespaces as param separators, while *nix will not",
+            "arg": {
+                "type": "str",
+                "default": "\"/c\" for Windows; \"-c\" for *nix"
+            }
+        },
+        {
             "long": "command-key",
             "desc": "Set the module key to display",
             "arg": {
@@ -1538,13 +1406,14 @@
                 "type": "enum",
                 "enum": {
                     "block": "\u2588\u2588\u2588",
+                    "background": "(whitespaces with background)",
                     "circle": "\u25cf",
                     "diamond": "\u25c6",
                     "triangle": "\u25b2",
                     "square": "\u25a0",
                     "star": "\u2605"
                 },
-                "default": "block"
+                "default": "background"
             }
         },
         {
@@ -1624,6 +1493,14 @@
             "desc": "Override the global \"--color-keys\" option for each specific module",
             "arg": {
                 "type": "color"
+            },
+            "pseudo": true
+        },
+        {
+            "long": "<module>-key-icon",
+            "desc": "Set the icon to be displayed by \"--key-type icon\"",
+            "arg": {
+                "type": "string"
             },
             "pseudo": true
         },

@@ -6,10 +6,11 @@
 #define FF_GPU_CORE_COUNT_UNSET -1
 #define FF_GPU_VMEM_SIZE_UNSET ((uint64_t)-1)
 #define FF_GPU_FREQUENCY_UNSET (0/0.0)
-#define FF_GPU_CORE_UTILIZATION_RATE_UNSET -1
 #define FF_GPU_INDEX_UNSET ((uint8_t)-1)
 #define FF_GPU_BUS_UNSET ((uint32_t)-1)
 #define FF_GPU_COUNT_UNSET ((uint32_t)-1)
+#define FF_GPU_FREQUENCY_UNSET 0
+#define FF_GPU_CORE_USAGE_UNSET (0/0.0)
 
 extern const char* FF_GPU_VENDOR_NAME_APPLE;
 extern const char* FF_GPU_VENDOR_NAME_AMD;
@@ -37,9 +38,9 @@ typedef struct FFGPUResult
     FFstrbuf driver;
     FFstrbuf platformApi;
     double temperature;
+    double coreUsage;
     int32_t coreCount;
-    double frequency; // Maximum time clock frequency in GHz
-    double coreUtilizationRate;
+    uint32_t frequency; // Maximum time clock frequency in MHz
     FFGPUMemory dedicated;
     FFGPUMemory shared;
     uint64_t deviceId; // Used internally, may be uninitialized
@@ -61,5 +62,5 @@ const char* ffDetectGPUImpl(const FFGPUOptions* options, FFlist* gpus);
 const char* ffGetGPUVendorString(unsigned vendorId);
 
 #if defined(__linux__) || defined(__FreeBSD__) || defined(__sun)
-void ffGPUParsePciIds(FFstrbuf* content, uint8_t subclass, uint16_t vendor, uint16_t device, FFGPUResult* gpu);
+void ffGPUParsePciIds(FFstrbuf* content, uint8_t subclass, uint16_t vendor, uint16_t device, FFGPUResult* gpu, FFstrbuf* coreName);
 #endif

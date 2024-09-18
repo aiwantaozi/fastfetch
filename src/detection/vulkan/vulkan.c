@@ -39,7 +39,7 @@ static void applyDriverName(VkPhysicalDeviceDriverPropertiesKHR* properties, FFs
 
 static const char* detectVulkan(FFVulkanResult* result)
 {
-    FF_LIBRARY_LOAD(vulkan, &instance.config.library.libVulkan, "dlopen libvulkan"FF_LIBRARY_EXTENSION " failed",
+    FF_LIBRARY_LOAD(vulkan, "dlopen libvulkan"FF_LIBRARY_EXTENSION " failed",
         #ifdef __APPLE__
             "libMoltenVK"FF_LIBRARY_EXTENSION, -1
         #elif defined(_WIN32)
@@ -239,7 +239,7 @@ static const char* detectVulkan(FFVulkanResult* result)
         gpu->coreCount = FF_GPU_CORE_COUNT_UNSET;
         gpu->temperature = FF_GPU_TEMP_UNSET;
         gpu->frequency = FF_GPU_FREQUENCY_UNSET;
-        gpu->coreUtilizationRate = FF_GPU_CORE_UTILIZATION_RATE_UNSET;
+        gpu->coreUsage = FF_GPU_CORE_USAGE_UNSET;
 
     next:
         continue;

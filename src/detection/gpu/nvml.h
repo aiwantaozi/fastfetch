@@ -154,3 +154,4 @@ extern nvmlReturn_t nvmlDeviceGetUUID(nvmlDevice_t device, char *uuid, unsigned 
 extern nvmlReturn_t nvmlDeviceGetIndex(nvmlDevice_t device, unsigned int *index);
 // Retrieves the name of this device.
 extern nvmlReturn_t nvmlDeviceGetName(nvmlDevice_t device, char *name, unsigned int length);
+

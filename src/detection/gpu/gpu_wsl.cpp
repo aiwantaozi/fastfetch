@@ -28,7 +28,7 @@ private:
 extern "C"
 const char* ffGPUDetectByDirectX(FF_MAYBE_UNUSED const FFGPUOptions* options, FFlist* gpus)
 {
-    FF_LIBRARY_LOAD(libdxcore, nullptr, "dlopen libdxcore.so failed. Make sure WSLg is enabled", "/usr/lib/wsl/lib/libdxcore" FF_LIBRARY_EXTENSION, 4)
+    FF_LIBRARY_LOAD(libdxcore, "dlopen libdxcore.so failed", "/usr/lib/wsl/lib/libdxcore" FF_LIBRARY_EXTENSION, 4)
     // DXCoreCreateAdapterFactory is a reloaded function, so we can't use FF_LIBRARY_LOAD_SYMBOL_MESSAGE here
     typedef HRESULT (*DXCoreCreateAdapterFactory_t)(REFIID riid, void** ppvFactory);
 
@@ -72,9 +72,10 @@ const char* ffGPUDetectByDirectX(FF_MAYBE_UNUSED const FFGPUOptions* options, FF
         ffStrbufInitS(&gpu->name, desc);
         gpu->index = FF_GPU_INDEX_UNSET;
         gpu->coreCount = FF_GPU_CORE_COUNT_UNSET;
+        gpu->coreUsage = FF_GPU_CORE_USAGE_UNSET;
         gpu->temperature = FF_GPU_TEMP_UNSET;
         gpu->frequency = FF_GPU_FREQUENCY_UNSET;
-        gpu->coreUtilizationRate = FF_GPU_CORE_UTILIZATION_RATE_UNSET;
+        gpu->deviceId = 0;
         ffStrbufInitStatic(&gpu->platformApi, "DXCore");
 
         ffStrbufInit(&gpu->driver);
@@ -117,14 +118,15 @@ const char* ffGPUDetectByDirectX(FF_MAYBE_UNUSED const FFGPUOptions* options, FF
                         .revId = hardwareId.revision,
                     },
                 };
-                ffDetectNvidiaGpuInfo(&cond, (FFGpuDriverResult){
-                   .temp = options->temp ? &gpu->temperature : NULL,
-                   .memory = options->driverSpecific ? &gpu->dedicated : NULL,
-                   .coreCount = options->driverSpecific ? (uint32_t *)&gpu->coreCount : NULL,
-                   .type = &gpu->type,
-                   .frequency = options->driverSpecific ? &gpu->frequency : NULL,
-                   .coreUtilizationRate = &gpu->coreUtilizationRate,
-               }, "/usr/lib/wsl/lib/libnvidia-ml.so");
+                ffDetectNvidiaGpuInfo(&cond, (FFGpuDriverResult) {
+                    .temp = options->temp ? &gpu->temperature : NULL,
+                    .memory = options->driverSpecific ? &gpu->dedicated : NULL,
+                    .coreCount = options->driverSpecific ? (uint32_t*) &gpu->coreCount : NULL,
+                    .coreUsage = options->driverSpecific ? &gpu->coreUsage : NULL,
+                    .type = &gpu->type,
+                    .frequency = options->driverSpecific ? &gpu->frequency : NULL,
+                    .name = options->driverSpecific ? &gpu->name : NULL,
+                }, "/usr/lib/wsl/lib/libnvidia-ml.so");
             }
         }
     }

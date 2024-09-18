@@ -37,9 +37,10 @@ void ffPrintBrightness(FFBrightnessOptions* options)
         else
         {
             uint32_t moduleIndex = result.length == 1 ? 0 : index + 1;
-            FF_PARSE_FORMAT_STRING_CHECKED(&key, &options->moduleArgs.key, 2, ((FFformatarg[]){
-                {FF_FORMAT_ARG_TYPE_UINT, &moduleIndex, "index"},
-                {FF_FORMAT_ARG_TYPE_STRBUF, &item->name, "name"},
+            FF_PARSE_FORMAT_STRING_CHECKED(&key, &options->moduleArgs.key, 3, ((FFformatarg[]){
+                FF_FORMAT_ARG(moduleIndex, "index"),
+                FF_FORMAT_ARG(item->name, "name"),
+                FF_FORMAT_ARG(options->moduleArgs.keyIcon, "icon"),
             }));
         }
 
@@ -72,12 +73,12 @@ void ffPrintBrightness(FFBrightnessOptions* options)
             FF_STRBUF_AUTO_DESTROY valueBar = ffStrbufCreate();
             ffPercentAppendBar(&valueBar, percent, options->percent, &options->moduleArgs);
             FF_PRINT_FORMAT_CHECKED(key.chars, 0, &options->moduleArgs, FF_PRINT_TYPE_NO_CUSTOM_KEY, FF_BRIGHTNESS_NUM_FORMAT_ARGS, ((FFformatarg[]) {
-                {FF_FORMAT_ARG_TYPE_STRBUF, &valueNum, "percentage"},
-                {FF_FORMAT_ARG_TYPE_STRBUF, &item->name, "name"},
-                {FF_FORMAT_ARG_TYPE_DOUBLE, &item->max, "max"},
-                {FF_FORMAT_ARG_TYPE_DOUBLE, &item->min, "min"},
-                {FF_FORMAT_ARG_TYPE_DOUBLE, &item->current, "current"},
-                {FF_FORMAT_ARG_TYPE_STRBUF, &item->current, "percentage-bar"},
+                FF_FORMAT_ARG(valueNum, "percentage"),
+                FF_FORMAT_ARG(item->name, "name"),
+                FF_FORMAT_ARG(item->max, "max"),
+                FF_FORMAT_ARG(item->min, "min"),
+                FF_FORMAT_ARG(item->current, "current"),
+                FF_FORMAT_ARG(item->current, "percentage-bar"),
             }));
         }
 
@@ -200,7 +201,7 @@ void ffInitBrightnessOptions(FFBrightnessOptions* options)
         ffPrintBrightnessHelpFormat,
         ffGenerateBrightnessJsonConfig
     );
-    ffOptionInitModuleArg(&options->moduleArgs);
+    ffOptionInitModuleArg(&options->moduleArgs, "󰯪");
 
     options->ddcciSleep = 10;
     options->percent = (FFColorRangeConfig) { 100, 100 };

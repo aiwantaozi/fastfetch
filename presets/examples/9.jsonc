@@ -4,7 +4,9 @@
         "type": "small"
     },
     "display": {
-        "keyWidth": 11,
+        "key": {
+            "width": 11
+        },
         "bar": {
             "charElapsed": "=",
             "charTotal": "-",
@@ -23,7 +25,10 @@
             "type": "disk",
             "folders": "/"
         },
-        "battery",
+        {
+            "type": "battery",
+            "key": "Battery"
+        },
         {
             "type": "colors",
             "paddingLeft": 10,

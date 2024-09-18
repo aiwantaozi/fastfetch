@@ -35,13 +35,12 @@ static const char* getSshdVersion(FFstrbuf* version)
 {
     const char* error = ffProcessAppendStdErr(version, (char* const[]) {
         "sshd",
-        "-qv",
+        "-V",
         NULL
     });
     if (error)
         return error;
 
-    // unknown option -- v
     // OpenSSH_9.0p1, OpenSSL 3.0.9 30 May 2023...
     ffStrbufSubstrBeforeFirstC(version, ',');
     ffStrbufSubstrAfterFirstC(version, '_');
@@ -55,7 +54,7 @@ static const char* getSshdVersion(FFstrbuf* version)
 
 static const char* getSddmVersion(FFstrbuf* version)
 {
-    FF_LIBRARY_LOAD(zlib, &instance.config.library.libZ, "dlopen libz failed", "libz" FF_LIBRARY_EXTENSION, 2)
+    FF_LIBRARY_LOAD(zlib, "dlopen libz failed", "libz" FF_LIBRARY_EXTENSION, 2)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(zlib, gzopen)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(zlib, gzread)
     FF_LIBRARY_LOAD_SYMBOL_MESSAGE(zlib, gzerror)

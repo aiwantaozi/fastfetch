@@ -22,9 +22,10 @@ static void printCPUCacheNormal(const FFCPUCacheResult* result, FFCPUCacheOption
         else
         {
             uint32_t index = i + 1;
-            FF_PARSE_FORMAT_STRING_CHECKED(&key, &options->moduleArgs.key, 2, ((FFformatarg[]){
-                {FF_FORMAT_ARG_TYPE_UINT, &index, "index"},
-                {FF_FORMAT_ARG_TYPE_STRING, levelStr, "level"},
+            FF_PARSE_FORMAT_STRING_CHECKED(&key, &options->moduleArgs.key, 3, ((FFformatarg[]){
+                FF_FORMAT_ARG(index, "index"),
+                FF_FORMAT_ARG(levelStr, "level"),
+                FF_FORMAT_ARG(options->moduleArgs.keyIcon, "icon"),
             }));
         }
 
@@ -61,8 +62,8 @@ static void printCPUCacheNormal(const FFCPUCacheResult* result, FFCPUCacheOption
             FF_STRBUF_AUTO_DESTROY buffer2 = ffStrbufCreate();
             ffParseSize(sum, &buffer2);
             FF_PRINT_FORMAT_CHECKED(key.chars, 0, &options->moduleArgs, FF_PRINT_TYPE_NO_CUSTOM_KEY, FF_CPUCACHE_NUM_FORMAT_ARGS, ((FFformatarg[]) {
-                {FF_FORMAT_ARG_TYPE_STRBUF, &buffer, "result"},
-                {FF_FORMAT_ARG_TYPE_STRBUF, &buffer2, "sum"},
+                FF_FORMAT_ARG(buffer, "result"),
+                FF_FORMAT_ARG(buffer2, "sum"),
             }));
         }
     }
@@ -94,8 +95,8 @@ static void printCPUCacheCompact(const FFCPUCacheResult* result, FFCPUCacheOptio
         FF_STRBUF_AUTO_DESTROY buffer2 = ffStrbufCreate();
         ffParseSize(sum, &buffer2);
         FF_PRINT_FORMAT_CHECKED(FF_CPUCACHE_DISPLAY_NAME, 0, &options->moduleArgs, FF_PRINT_TYPE_DEFAULT, FF_CPUCACHE_NUM_FORMAT_ARGS, ((FFformatarg[]) {
-            {FF_FORMAT_ARG_TYPE_STRBUF, &buffer, "result"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &buffer2, "sum"},
+            FF_FORMAT_ARG(buffer, "result"),
+            FF_FORMAT_ARG(buffer2, "sum"),
         }));
     }
 }
@@ -248,7 +249,7 @@ void ffInitCPUCacheOptions(FFCPUCacheOptions* options)
         ffPrintCPUCacheHelpFormat,
         ffGenerateCPUCacheJsonConfig
     );
-    ffOptionInitModuleArg(&options->moduleArgs);
+    ffOptionInitModuleArg(&options->moduleArgs, "");
 
     options->compact = false;
 }

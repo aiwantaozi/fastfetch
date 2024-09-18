@@ -83,7 +83,7 @@ static const char* openCLHandleData(OpenCLData* data, FFOpenCLResult* result)
             gpu->dedicated.total = gpu->dedicated.used = gpu->shared.total = gpu->shared.used = FF_GPU_VMEM_SIZE_UNSET;
             gpu->deviceId = (size_t) deviceID;
             gpu->frequency = FF_GPU_FREQUENCY_UNSET;
-            gpu->coreUtilizationRate = FF_GPU_CORE_UTILIZATION_RATE_UNSET;
+            gpu->coreUsage = FF_GPU_CORE_USAGE_UNSET;
 
             if (data->ffclGetDeviceInfo(deviceID, CL_DEVICE_VERSION, sizeof(buffer), buffer, NULL) == CL_SUCCESS)
             {
@@ -119,7 +119,7 @@ static const char* openCLHandleData(OpenCLData* data, FFOpenCLResult* result)
             {
                 cl_uint value;
                 if (data->ffclGetDeviceInfo(deviceID, CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(value), &value, NULL) == CL_SUCCESS)
-                    gpu->frequency = value / 1000.;
+                    gpu->frequency = value;
             }
 
             {
@@ -150,7 +150,7 @@ static const char* detectOpenCL(FFOpenCLResult* result)
 
     #ifndef __APPLE__
 
-    FF_LIBRARY_LOAD(opencl, &instance.config.library.libOpenCL, "dlopen libOpenCL" FF_LIBRARY_EXTENSION" failed",
+    FF_LIBRARY_LOAD(opencl, "dlopen libOpenCL" FF_LIBRARY_EXTENSION" failed",
     #ifdef _WIN32
         "OpenCL"FF_LIBRARY_EXTENSION, -1,
     #endif

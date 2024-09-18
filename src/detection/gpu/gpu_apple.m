@@ -45,6 +45,7 @@ const char* ffGpuDetectMetal(FFlist* gpus)
             gpu->type = device.hasUnifiedMemory ? FF_GPU_TYPE_INTEGRATED : FF_GPU_TYPE_DISCRETE;
             gpu->index = (uint8_t)device.locationNumber;
             #endif
+<<<<<<< HEAD
 
             int registryID_string_length = snprintf(NULL, 0, "%llu", device.registryID);
             if (registryID_string_length > 0) {
@@ -68,6 +69,8 @@ const char* ffGpuDetectMetal(FFlist* gpus)
                 gpu->dedicated.total = device.recommendedMaxWorkingSetSize;
                 gpu->dedicated.used = device.currentAllocatedSize;
             }
+=======
+>>>>>>> 2.24.0
         }
         return NULL;
     }

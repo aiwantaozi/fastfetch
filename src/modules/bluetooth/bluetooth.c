@@ -35,12 +35,12 @@ static void printDevice(FFBluetoothOptions* options, const FFBluetoothResult* de
         ffPercentAppendBar(&percentageBar, device->battery, options->percent, &options->moduleArgs);
 
         FF_PRINT_FORMAT_CHECKED(FF_BLUETOOTH_MODULE_NAME, index, &options->moduleArgs, FF_PRINT_TYPE_DEFAULT, FF_BLUETOOTH_NUM_FORMAT_ARGS, ((FFformatarg[]) {
-            {FF_FORMAT_ARG_TYPE_STRBUF, &device->name, "name"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &device->address, "address"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &device->type, "type"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &percentageNum, "battery-percentage"},
-            {FF_FORMAT_ARG_TYPE_BOOL, &device->connected, "connected"},
-            {FF_FORMAT_ARG_TYPE_STRBUF, &percentageBar, "battery-percentage-bar"},
+            FF_FORMAT_ARG(device->name, "name"),
+            FF_FORMAT_ARG(device->address, "address"),
+            FF_FORMAT_ARG(device->type, "type"),
+            FF_FORMAT_ARG(percentageNum, "battery-percentage"),
+            FF_FORMAT_ARG(device->connected, "connected"),
+            FF_FORMAT_ARG(percentageBar, "battery-percentage-bar"),
         }));
     }
 }
@@ -178,8 +178,8 @@ void ffGenerateBluetoothJsonResult(FF_MAYBE_UNUSED FFBluetoothOptions* options, 
 void ffPrintBluetoothHelpFormat(void)
 {
     FF_PRINT_MODULE_FORMAT_HELP_CHECKED(FF_BLUETOOTH_MODULE_NAME, "{1} ({4})", FF_BLUETOOTH_NUM_FORMAT_ARGS, ((const char* []) {
-        "Name - name",
-        "Address - address",
+        "Name - device name",
+        "Address - remote device address",
         "Type - type",
         "Battery percentage number - battery-percentage",
         "Is connected - connected",
@@ -192,7 +192,7 @@ void ffInitBluetoothOptions(FFBluetoothOptions* options)
     ffOptionInitModuleBaseInfo(
         &options->moduleInfo,
         FF_BLUETOOTH_MODULE_NAME,
-        "List bluetooth devices",
+        "List (connected) bluetooth devices",
         ffParseBluetoothCommandOptions,
         ffParseBluetoothJsonObject,
         ffPrintBluetooth,
@@ -200,7 +200,7 @@ void ffInitBluetoothOptions(FFBluetoothOptions* options)
         ffPrintBluetoothHelpFormat,
         ffGenerateBluetoothJsonConfig
     );
-    ffOptionInitModuleArg(&options->moduleArgs);
+    ffOptionInitModuleArg(&options->moduleArgs, "");
     options->showDisconnected = false;
     options->percent = (FFColorRangeConfig) { 50, 20 };
 }

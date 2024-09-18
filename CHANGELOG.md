@@ -1,3 +1,276 @@
+# 2.24.0
+
+Changes:
+* Support of `--lib-XXX` is removed
+    * If fastfetch fails to load some `.so` `.dylib` libraries, `LD_LIBRARY_PATH` should be used.
+
+Features:
+* Support sixel image protocol on Windows (Logo, Windows)
+    * Requires imagemagick7 to be installed. MSYS2 is recommended.
+* Improve terminal query on Windows (Windows)
+    * TerminalSize, TerminalTheme
+* Detect more ARM microarchitectures and SOC names (CPU, Linux)
+* Detect the number of online cores (CPU, FreeBSD)
+* Support board name detection for Asahi Linux (Board, Linux)
+* Add new option `--command-param` to customize the parameters when running shell
+* Support syntax of sub string in `--<module>-format`: `{variable~startIndex,endIndex}`
+    * See `fastfetch -h format` for detail
+
+Bugfixes:
+* Fix tests building when system yyjson is used (#1244)
+* Fix dinit detection; support dinit version detection (#1245, InitSystem, Linux)
+* Fix signal quality, refresh rate and maybe others in custom format (#1241)
+* Fix boot time calculation (#1249, Uptime, Linux)
+* Fix custom format for boolean values
+    * `{?false-value}This should not print{?}{?true-value}This should print{?}` will print `This should print`
+* Fix possible hanging when running fastfetch in screen 5.0 (TerminalTheme, macOS)
+
+Logos:
+* Add Lliurex
+
+# 2.23.0
+
+Features:
+* Support unity version detection (DE, Linux)
+* Print model name in Battery keys if available (Battery)
+* Add module `Zpool`
+* Improve performance (Shell / Terminal, Linux)
+* Support syntax of padded strings in `--<module>-format`. `{variable<padlength}` and `{variable>padlength}` are supported.
+    * If pad length is greater than the length of the variable, the variable will be padded with spaces.
+        * `fastfetch -l none -s command --command-text 'echo 12345' --command-format 'output({1<20})'` prints `Command: output(12345               )`
+        * `fastfetch -l none -s command --command-text 'echo 12345' --command-format 'output({1>20})'` prints `Command: output(               12345)`
+    * If pad length is less than the length of the variable, the variable will be truncated.
+
+Bugfixes:
+* Fix broken `--list-presets`
+* Update zsh completion script
+* Don't print `*` if `defaultRouteOnly` is set (NetIO)
+* Fix Camera module incorrectly disabled on FreeBSD (Camera, FreeBSD)
+* Fix hanging on screen 5.0 (Terminal)
+* Improve image logo support on Windows (Logo, Windows)
+
+Logos:
+* Update AmogOS
+* Add Magix
+* Make ubuntu logo colorable
+* Add Steam Deck Logo
+* add Huawei Cloud EulerOS
+
+# 2.22.0
+
+Features:
+* Small performance improvements (Terminal, Editor)
+* Improve arm32 and loongarch support (CPU, Linux)
+* Ignore the parent process if env `$FFTS_IGNORE_PARENT` is set to `1` (Shell)
+* Add code name of Apple M4 (CPU, Linux)
+* Add ethernet speed rate detection support (LocalIP)
+* Add zsh completion script
+* Add Linglong package manager detection support (Packages, Linux)
+
+Bugfixes:
+* Fix building on macOS 10.14
+* Fix tmux in linux TTY (Colors)
+* Fix hang in WSL when custom format is used (Disk, Linux)
+* Fix `/proc/loadavg` parsing (Loadavg, Linux)
+* Disable use of `LC_NUMERIC` locale settings to fix parsing of decimal numbers
+* Fix possible segfault (DiskIO, Linux)
+* Honor `preciseRefreshRate` in custom format (Display)
+
+Logos:
+* Add Lingmo OS
+* Add Sleeper OS
+
+# 2.21.3
+
+Bugfixes:
+* Fix bad Intel Arc GPU name detection, which was supposed to be fixed in the last version but the change was reverted accidentally (#1177, GPU, Linux)
+* Fix arm32 CPU name detection no longer work. Regression of 2.21.2 (CPU, Linux)
+
+# 2.21.2
+
+Features:
+* Support `--stat <num_in_ms>` to display long running modules in yellow or red
+
+Bugfixes:
+* Fix bad Intel Arc GPU name and type detection (GPU, Linux)
+* Fix uninited struct fields (GPU, Linux)
+* Skip cpu model smbios detection on ARM platforms (CPU, Linux)
+* Always use `CurrentControlSet` instead of `ControlSet001` when querying registry (Windows)
+* Fix NVIDIA GPUs are missing in GPU detection sometimes (GPU, Windows)
+* Fixing detection of `pthread_timedjoin_np` (Linux)
+
+Logos:
+* Add HyprOS
+* Add GoldenDog Linux
+
+# 2.21.1
+
+Hotfix for a regression that breaks WM detection when running `startx` from TTY (Regression from 2.21.0, #1172 / #1162)
+
+Changes:
+* On Linux, FreeBSD and SunOS, a new recommended dependency `libelf` is introduced to extract strings in ELF binary, used for
+    * st term font detection when the term font is compiled directly into the binary
+    * fast path of systemd version detection
+
+Features:
+* Improve performance of
+    * kitty version detection (Terminal, Linux)
+    * st term font detection (TerminalFont, Linux)
+    * systemd version detection (InitSystem, Linux)
+
+Bugfixes:
+* Fix building error without `linux/wireless.h` (Wifi, Linux)
+* Fix wrong GPU max frequency on Asahi Linux (GPU, Linux)
+* Don't rely `$XDG_SESSION_TYPE` for detecting wm protocol (#1172 / #1162, WM, Linux)
+* Fix light color doesn't work on Linux console (Colors, Linux)
+* `LC_ALL`, if set, overrides every other locale-related environment variable (Locale)
+* Increase timeout of DBus calls (Linux)
+
+Logos:
+* Add vanilla_small and vanilla2
+* Add LFS (Linux From Scratch)
+
+# 2.21.0
+
+Changes:
+* We no longer use `libnm` for Wifi detection on Linux. Instead, we use `libdbus` to communicate with NetworkManager directly
+    * To package managers: libnm dependency should be removed
+
+Features:
+* Add module `BluetoothRadio` that prints bluetooth radios installed on the system
+    * Don't confuse with module `Bluetooth` which lists connected bluetooth devices
+* Detect more information when `--gpu-driver-specific` is used (GPU)
+* Detect which type of nvidia driver (open source or proprietary) is used (GPU, Linux)
+* `--gpu-driver-specific` adds supports for Moore Threads GPU (#1142, GPU, Linux / Windows)
+* Use SetupAPI for detecting GPUs to support GPU detection when running fastfetch as a Windows Service (GPU, Windows)
+    * See https://github.com/gpustack/gpustack/pull/97#issuecomment-2264699787 for detail
+* Detect playback status (Media, Linux)
+
+Bugfixes:
+* Don't try to connect display server in tty mode (Linux, #1110)
+* Improve ssh detection
+* Fix max frequency printing in custom format (CPU)
+* Fix displaying random characters when detecting kitty term font (#1136 / #1145, TerminalFont, Linux)
+* Make sure to detect all physical memory devices (#1137)
+* Don't detect `wl-restart` as WM (#1135, WM, Linux)
+* Use PCI bus ID to match Nvidia cards; fix multi-GPU detection (GPU)
+* Ignore invalid GPU (#1066, GPU, macOS)
+* Print error when invalid color code is found (#1138)
+* Fix invalid refresh rate detection on old macOS versions (Display, macOS)
+* Fix disk size detection on 32-bit systems (Disk, BSD)
+* Don't ignore disabled GPUs (#1140, GPU, Linux)
+* Fix GPU type detection on FreeBSD (GPU, FreeBSD)
+* Remove shell version detection for unknown shells (#1144, Shell)
+* Don't detect hyfetch as shell on NixOS (Shell, NixOS)
+
+Logos:
+* Update EndeavourOS_small
+* Add QTS
+
+# 2.20.0
+
+This release fixes regression of `2.19.0` on M1 MacBook Air. It also introduces a new option `--key-type icon` to display predefined icons in keys (requires newest nerd font). See `fastfetch -h key-type` for detail.
+
+Changes:
+* JSON option `display.keyWidth` has been renamed to `display.key.width`
+    * Previously: `{ "display": { "keyWidth": 3 } }`
+    * Now: `{ "display": { "key": { "width": 3 } } }`
+* Windows Terminal font detection **in WSL** has been removed due to [issue #1113](https://github.com/fastfetch-cli/fastfetch/issues/1113)
+
+Features:
+* Add option `display.key.type: <enum>` to print icons in keys
+    * Supported value `string`, `icon` and `both`. Default to `string` (don't display icons)
+    * Example: `{ "display": { "key": { "type": "icon" } } }`
+* Add option `display.key.paddingLeft: <num>` to print left padding (whitespaces) in keys
+    * Example: `{ "display": { "key": { "paddingLeft": 2 } } }`
+* Add option `modules.keyIcon` to set icon for specified module
+    * Example: `{ "modules": { "type": "command", "keyIcon": "🔑" } }`
+* Report system mono font name for Terminator if used (TerminalFont, Linux)
+* Don't require logo height to be set when using `--logo-position right`
+* Report Snapdragon SOC marketing name for newer Android phones (CPU, Android)
+* Detect MTK SOC part name (CPU, Android)
+
+Bugfixes:
+* Don't wake up suspended GPUs when using `--ds-force-drm` (Display, Linux)
+* Fix printing editor type in JSON result (Editor)
+* Fix `--logo-padding-*` not working correctly (#1121, Logo)
+* Fix possible segfault when detecting GPU frequency (#1121, macOS, GPU)
+
+# 2.19.1
+
+Bugfixes
+* Fix frequency value printing when using custom format (#1111, CPU / GPU)
+* Fix display detection for XiaoMi Android phone (Display, Android)
+
+Features:
+* Display if HDR mode is enabled for screens (Display)
+    * Supported in Windows and Linux (KDE) correctly
+
+# 2.19.0
+
+Changes:
+* JSON option `modules.cpu.freqNdigits` has been renamed and moved to `display.freq.ndigits`
+    * Previously: `{ "modules": { "type": "cpu", "freqNdigits": 2 } }`
+    * Now: `{ "display": { "freq": { "ndigits": 2 } } }`
+    * This option now affects GPU frequency too
+    * By default, frequencies are displayed in *GHz*. Set `display.freq.ndigits` to `-1` to display them in *MHz*
+* JSON option `display.binaryPrefix` has been moved to `display.size.binaryPrefix`
+    * Previously: `{ "display": { "binaryPrefix": "IEC" } }`
+    * Now: `{ "display": { "size": { "binaryPrefix": "IEC" } } }`
+
+Features:
+* Print physical diagonal length if supported (Display)
+* Detect display type in X11 mode (Display)
+* Assume displays connected via DisplayPort are external monitors (Display, Linux)
+* Support GPU frequency detection for Intel XE driver (GPU, Linux)
+* Detect init system on Android (InitSystem, Android)
+* Use background to display color blocks (Colors)
+    * To fix weird vertical black lines in some terminals and match the behavior of neofetch (#1094)
+    * Can be reverted to old behavior with `--colors-symbol block`
+* Support Zed terminal version detection (Terminal)
+* Improve wezterm font detection (TerminalFont)
+* Add option `--separator-length`
+* Support GPU frequency detection for Apple Silicon (GPU, macOS)
+* Detect maximum refresh rate (#1101, Monitor)
+* Detect if HDR mode is supported and enabled (Windows, Display / Monitor)
+* Support physical monitor info detection for FreeBSD and SunOS (Monitor)
+* Support defining constant strings in JSON config file, which can be used to dedupe formattion strings
+```jsonc
+{
+    "display": {
+        "constants": [
+            "Hello", // {$1}
+            "world"  // {$2}
+        ]
+    },
+    "modules": [
+        {
+            "type": "custom",
+            "format": "{$1} {$2}!" // print "Hello world!"
+        },
+        {
+            "type": "custom",
+            "format": "{$2} {$1}" // print "world Hello"
+        }
+    ]
+}
+```
+
+Bugfixes:
+* Fix some presets
+* Better detection for XTerm terminal fonts (#1095, TerminalFont, Linux)
+* Remove debug output (#1097, Windows)
+* Fix command line option `--gpu-hide-type` doesn't work (#1098, GPU)
+* Fix wrong date on Raspbian 10 (#1108, DateTime, Linux)
+* Use `brightness` instead of `actuall_brightness` when detecting current brightness level (Brightness, Linux)
+    * Ref: https://bugzilla.kernel.org/show_bug.cgi?id=203905
+* Fix buffer overflow with long font family names when detecting kitty term font (TerminalFont)
+* Fix some typos
+
+Logos:
+* Update void_small
+* Add ALT Linux
+
 # 2.18.1
 
 Fix a regression introduced in v2.18.0

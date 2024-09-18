@@ -8,6 +8,7 @@
 #include "detection/displayserver/displayserver.h"
 #include "util/mallocHelper.h"
 #include "util/stringUtils.h"
+#include "util/binary.h"
 
 static const char* getSystemMonospaceFont(void)
 {
@@ -286,6 +287,13 @@ static void detectXterm(FFTerminalFontResult* terminalFont)
     ffFontInitValues(&terminalFont->font, fontName.chars, fontSize.chars);
 }
 
+static bool extractStTermFont(const char* str, FF_MAYBE_UNUSED uint32_t len, void* userdata)
+{
+    if (!ffStrContains(str, "size=")) return true;
+    ffStrbufSetNS((FFstrbuf*) userdata, len, str);
+    return false;
+}
+
 static void detectSt(FFTerminalFontResult* terminalFont, const FFTerminalResult* terminal)
 {
     FF_STRBUF_AUTO_DESTROY size = ffStrbufCreateF("/proc/%u/cmdline", terminal->pid);
@@ -306,30 +314,18 @@ static void detectSt(FFTerminalFontResult* terminalFont, const FFTerminalResult*
     else
     {
         ffStrbufClear(&font);
-        if (ffProcessAppendStdOut(&font, (char* const[]) {
-            "strings",
-            terminal->exePath.chars,
-            NULL,
-        }) != NULL || font.length == 0)
+
+        const char* error = ffBinaryExtractStrings(terminal->exePath.chars, extractStTermFont, &font, (uint32_t) strlen("size=0"));
+        if (error)
         {
-            ffStrbufAppendS(&terminalFont->error, "Failed to run `strings st`");
+            ffStrbufAppendS(&terminalFont->error, error);
             return;
         }
-
-        // Search font config string in st binary
-        uint32_t middleIndex = ffStrbufFirstIndexS(&font, "size=");
-        if (middleIndex == font.length)
+        if (font.length == 0)
         {
             ffStrbufAppendS(&terminalFont->error, "No font config found in st binary");
             return;
         }
-
-        uint32_t startIndex = ffStrbufPreviousIndexC(&font, middleIndex, '\n');
-        if (startIndex == font.length) startIndex = 0;
-        uint32_t endIndex = ffStrbufNextIndexC(&font, middleIndex, '\n');
-
-        ffStrbufSubstrBefore(&font, endIndex);
-        ffStrbufSubstrAfter(&font, startIndex);
     }
 
     // JetBrainsMono Nerd Font Mono:pixelsize=12:antialias=true:autohint=true
@@ -379,6 +375,30 @@ static void detectWarp(FFTerminalFontResult* terminalFont)
     }
 }
 
+static void detectTerminator(FFTerminalFontResult* result)
+{
+    FF_STRBUF_AUTO_DESTROY useSystemFont = ffStrbufCreate();
+    FF_STRBUF_AUTO_DESTROY fontName = ffStrbufCreate();
+
+    if(!ffParsePropFileConfigValues("terminator/config", 2, (FFpropquery[]) {
+        {"use_system_font =", &useSystemFont},
+        {"font =", &fontName},
+    }) || ffStrbufIgnCaseEqualS(&useSystemFont, "True"))
+    {
+        FF_AUTO_FREE const char* fontName = getSystemMonospaceFont();
+        if(ffStrSet(fontName))
+            ffFontInitPango(&result->font, fontName);
+        else
+            ffStrbufAppendS(&result->error, "Couldn't get system monospace font name from GSettings / DConf");
+        return;
+    }
+
+    if(fontName.length == 0)
+        ffFontInitValues(&result->font, "Mono", "10");
+    else
+        ffFontInitPango(&result->font, fontName.chars);
+}
+
 static void detectWestonTerminal(FFTerminalFontResult* terminalFont)
 {
     FF_STRBUF_AUTO_DESTROY font = ffStrbufCreate();
@@ -426,4 +446,6 @@ void ffDetectTerminalFontPlatform(const FFTerminalResult* terminal, FFTerminalFo
         detectWarp(terminalFont);
     else if(ffStrbufIgnCaseEqualS(&terminal->processName, "weston-terminal"))
         detectWestonTerminal(terminalFont);
+    else if(ffStrbufStartsWithIgnCaseS(&terminal->processName, "terminator"))
+        detectTerminator(terminalFont);
 }

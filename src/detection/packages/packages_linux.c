@@ -322,7 +322,7 @@ static uint32_t getSnap(FFstrbuf* baseDir)
 
 static uint32_t getRpmFromLibrpm(void)
 {
-    FF_LIBRARY_LOAD(rpm, &instance.config.library.librpm, 0, "librpm" FF_LIBRARY_EXTENSION, 12)
+    FF_LIBRARY_LOAD(rpm, 0, "librpm" FF_LIBRARY_EXTENSION, 12)
     FF_LIBRARY_LOAD_SYMBOL(rpm, rpmReadConfigFiles, 0)
     FF_LIBRARY_LOAD_SYMBOL(rpm, rpmtsCreate, 0)
     FF_LIBRARY_LOAD_SYMBOL(rpm, rpmtsInitIterator, 0)
@@ -471,6 +471,7 @@ static void getPackageCounts(FFstrbuf* baseDir, FFPackagesResult* packageCounts,
     {
       packageCounts->guixSystem += getGuixPackages(baseDir, "/run/current-system/profile");
     }
+    if (!(options->disabled & FF_PACKAGES_FLAG_LINGLONG_BIT)) packageCounts->linglong += getNumElements(baseDir, "/var/lib/linglong/repo/refs/heads/main", DT_DIR);
 }
 
 static void getPackageCountsRegular(FFstrbuf* baseDir, FFPackagesResult* packageCounts, FFPackagesOptions* options)

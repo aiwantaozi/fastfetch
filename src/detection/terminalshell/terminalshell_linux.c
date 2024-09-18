@@ -42,7 +42,6 @@ static pid_t getShellInfo(FFShellResult* result, pid_t pid)
                 ffStrbufEqualS(&result->processName, "sudo")                ||
                 ffStrbufEqualS(&result->processName, "su")                  ||
                 ffStrbufEqualS(&result->processName, "strace")              ||
-                ffStrbufEqualS(&result->processName, "sshd")                ||
                 ffStrbufEqualS(&result->processName, "gdb")                 ||
                 ffStrbufEqualS(&result->processName, "lldb")                ||
                 ffStrbufEqualS(&result->processName, "lldb-mi")             ||
@@ -51,7 +50,7 @@ static pid_t getShellInfo(FFShellResult* result, pid_t pid)
                 ffStrbufEqualS(&result->processName, "perf")                ||
                 ffStrbufEqualS(&result->processName, "guake-wrapped")       ||
                 ffStrbufEqualS(&result->processName, "time")                ||
-                ffStrbufEqualS(&result->processName, "hyfetch")             || //when hyfetch uses fastfetch as backend
+                ffStrbufContainS(&result->processName, "hyfetch")           || //when hyfetch uses fastfetch as backend
                 ffStrbufEqualS(&result->processName, "clifm")               || //https://github.com/leo-arch/clifm/issues/289
                 ffStrbufEqualS(&result->processName, "valgrind")            ||
                 ffStrbufEqualS(&result->processName, "fastfetch")           || //994
@@ -102,7 +101,6 @@ static pid_t getTerminalInfo(FFTerminalResult* result, pid_t pid)
             ffStrbufEqualS(&result->processName, "oil.ovm")    ||
             ffStrbufEqualS(&result->processName, "xonsh")      || // works in Linux but not in macOS because kernel returns `Python` in this case
             ffStrbufEqualS(&result->processName, "login")      ||
-            ffStrbufEqualS(&result->processName, "sshd")       ||
             ffStrbufEqualS(&result->processName, "clifm")      || // https://github.com/leo-arch/clifm/issues/289
             ffStrbufEqualS(&result->processName, "chezmoi")    || // #762
             #ifdef __linux__
@@ -276,14 +274,14 @@ static void getUserShellFromEnv(FFShellResult* result)
     }
 }
 
-bool fftsGetShellVersion(FFstrbuf* exe, const char* exeName, FFstrbuf* version);
+bool fftsGetShellVersion(FFstrbuf* exe, const char* exeName, FFstrbuf* exePath, FFstrbuf* version);
 
 bool fftsGetTerminalVersion(FFstrbuf* processName, FFstrbuf* exe, FFstrbuf* version);
 
 static void setShellInfoDetails(FFShellResult* result)
 {
     ffStrbufClear(&result->version);
-    fftsGetShellVersion(&result->exe, result->exeName, &result->version);
+    fftsGetShellVersion(&result->exe, result->exeName, &result->exePath, &result->version);
 
     if(ffStrbufEqualS(&result->processName, "pwsh"))
         ffStrbufInitStatic(&result->prettyName, "PowerShell");
@@ -314,6 +312,8 @@ static void setTerminalInfoDetails(FFTerminalResult* result)
         ffStrbufInitStatic(&result->prettyName, "tmux");
     else if(ffStrbufStartsWithS(&result->processName, "screen-"))
         ffStrbufInitStatic(&result->prettyName, "screen");
+    else if(ffStrbufEqualS(&result->processName, "sshd") || ffStrbufStartsWithS(&result->processName, "sshd-"))
+        ffStrbufInitCopy(&result->prettyName, &result->tty);
 
     #if defined(__ANDROID__)
 
@@ -384,6 +384,14 @@ const FFShellResult* ffDetectShell()
     result.tty = -1;
 
     pid_t ppid = getppid();
+
+    const char* ignoreParent = getenv("FFTS_IGNORE_PARENT");
+    if (ignoreParent && ffStrEquals(ignoreParent, "1"))
+    {
+        FF_STRBUF_AUTO_DESTROY _ = ffStrbufCreate();
+        ffProcessGetBasicInfoLinux(ppid, &_, &ppid, NULL);
+    }
+
     ppid = getShellInfo(&result, ppid);
     getUserShellFromEnv(&result);
     setShellInfoDetails(&result);
