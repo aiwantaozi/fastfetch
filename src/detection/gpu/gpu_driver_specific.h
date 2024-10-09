@@ -51,6 +51,7 @@ const char* ffDetectNvidiaGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverR
 const char* ffDetectIntelGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverResult result, const char* soName);
 const char* ffDetectAmdGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverResult result, const char* soName);
 const char* ffDetectMthreadsGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverResult result, const char* soName);
+const char* ffDetectHuaweiGpuInfo(const FFGpuDriverCondition* cond, FFGpuDriverResult result, const char* soName);
 
 FF_MAYBE_UNUSED static inline bool getDriverSpecificDetectionFn(const char* vendor, __typeof__(&ffDetectNvidiaGpuInfo)* pDetectFn, const char** pDllName)
 {
@@ -70,6 +71,17 @@ FF_MAYBE_UNUSED static inline bool getDriverSpecificDetectionFn(const char* vend
         *pDllName = "mtml.dll";
         #else
         *pDllName = "libmtml.so";
+        #endif
+    }
+    else if (vendor == FF_GPU_VENDOR_NAME_HUAWEI)
+    {
+        *pDetectFn = ffDetectHuaweiGpuInfo;
+        #ifdef _WIN32
+            *pDetectFn = NULL;
+            *pDllName = NULL;
+            return false;
+        #else
+            *pDllName = "libascendcl.so";
         #endif
     }
     #ifdef _WIN32

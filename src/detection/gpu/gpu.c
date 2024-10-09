@@ -15,6 +15,7 @@ const char* FF_GPU_VENDOR_NAME_PARALLEL = "Parallel";
 const char* FF_GPU_VENDOR_NAME_MICROSOFT = "Microsoft";
 const char* FF_GPU_VENDOR_NAME_REDHAT = "RedHat";
 const char* FF_GPU_VENDOR_NAME_ORACLE = "Oracle";
+const char* FF_GPU_VENDOR_NAME_HUAWEI = "Huawei";
 
 const char* ffGetGPUVendorString(unsigned vendorId)
 {
@@ -33,6 +34,7 @@ const char* ffGetGPUVendorString(unsigned vendorId)
         case 0x1ab8: return FF_GPU_VENDOR_NAME_PARALLEL;
         case 0x1414: return FF_GPU_VENDOR_NAME_MICROSOFT;
         case 0x108e: return FF_GPU_VENDOR_NAME_ORACLE;
+        case 0x19e5: return FF_GPU_VENDOR_NAME_HUAWEI;
         default: return NULL;
     }
 }

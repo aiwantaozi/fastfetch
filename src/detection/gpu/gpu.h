@@ -19,6 +19,7 @@ extern const char* FF_GPU_VENDOR_NAME_PARALLEL;
 extern const char* FF_GPU_VENDOR_NAME_MICROSOFT;
 extern const char* FF_GPU_VENDOR_NAME_REDHAT;
 extern const char* FF_GPU_VENDOR_NAME_ORACLE;
+extern const char* FF_GPU_VENDOR_NAME_HUAWEI;
 
 typedef struct FFGPUMemory
 {
