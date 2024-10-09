@@ -91,8 +91,8 @@ extern aclError aclrtGetMemInfo(aclrtMemAttr attr, size_t *free, size_t *total);
 
 // https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC3alpha003/apiref/appdevgapi/aclcppdevg_03_0036.html
 // Obtains the hardware specifications and size corresponding to the Device in the running environment.
-extern aclError aclGetDeviceCapability(uint32_t deviceId, aclDeviceInfo deviceInfo, int64_t *value);
+// extern aclError aclGetDeviceCapability(uint32_t deviceId, aclDeviceInfo deviceInfo, int64_t *value);
 
 // https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC3alpha003/apiref/appdevgapi/aclcppdevg_03_0046.html
 // Obtains the Cube, Vector, AI CPU utilization rate.
-extern aclError aclrtGetDeviceUtilizationRate(int32_t deviceId, aclrtUtilizationInfo *utilizationInfo);
+// extern aclError aclrtGetDeviceUtilizationRate(int32_t deviceId, aclrtUtilizationInfo *utilizationInfo);
